@@ -1,0 +1,1 @@
+# plugins-brands-for-woocommerce
