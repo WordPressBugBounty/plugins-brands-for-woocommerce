@@ -55,7 +55,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
             'banner_width_units'           => '%',
             'display_description'          => 1,
             'display_link'                 => 1,
-            'link_text'                    => __( 'Go to the brand website >>', 'brands-for-woocommerce' ),
+            'link_text'                    => 'Go to the brand website >>',
             'link_open_in_new_tab'         => 1,
             'brand_products_out_of_stock'  => '',
             'related_products_display'     => 1,
@@ -90,32 +90,32 @@ class BeRocket_product_brand extends BeRocket_Framework {
         $this->attributes = array(
             'brand_image_url' => array(
                 'type' => 'image',
-                "label" => __( 'Thumbnail', 'brands-for-woocommerce' ),
+                "label" => 'Thumbnail',
                 'image_name' => 'br_brand_image',
                 'default' => '',
             ),
             'brand_banner_url' => array(
                 'type' => 'image',
-                "label" => __( 'Banner', 'brands-for-woocommerce' ),
+                "label" => 'Banner',
                 'image_name' => 'br_brand_banner',
                 'default' => '',
             ),
             'br_brand_category' => array(
                 'type' => 'category_checklist',
-                "label" => __( 'Categories', 'brands-for-woocommerce' ),
-                'description' => __( 'Product categories', 'brands-for-woocommerce' ),
+                "label" => 'Categories',
+                'description' => 'Product categories',
                 'default' => false,
             ),
             'br_brand_tooltip' => array(
                 'type' => 'text',
-                "label" => __( 'Tooltip', 'brands-for-woocommerce' ),
-                'description' => __( 'Optional message to pop up on hover or on click', 'brands-for-woocommerce' ),
+                "label" => 'Tooltip',
+                'description' => 'Optional message to pop up on hover or on click',
                 'default' => '',
             ),
             'br_brand_related' => array(
                 'type' => 'products_selector',
-                "label" => __( 'Related products', 'brands-for-woocommerce' ),
-                'description' => __( 'Products that may be related to this brand', 'brands-for-woocommerce' ),
+                "label" => 'Related products',
+                'description' => 'Products that may be related to this brand',
                 'default' => '',
             ),
             'br_brand_order' => array(
@@ -123,32 +123,18 @@ class BeRocket_product_brand extends BeRocket_Framework {
                 "label" => '',
                 'default' => 0,
             ),
-            // 'br_brand_order' => array(
-            //     'type' => 'number',
-            //     'attributes' => array(
-            //         'min' => '0',
-            //     ),
-            //     "label" => __( 'Order', 'brands-for-woocommerce' ),
-            //     'description' => __( 'Order for output the brand ', 'brands-for-woocommerce' ),
-            //     'default' => 0,
-            // ),
             'br_brand_featured' => array(
                 'type' => 'checkbox',
-                "label" => __( 'Featured', 'brands-for-woocommerce' ),
-                'description' => __( 'Featured brands can be output first or you may select to show featured brands only', 'brands-for-woocommerce' ),
+                "label" => 'Featured',
+                'description' => 'Featured brands can be output first or you may select to show featured brands only',
                 'default' => '',
             ),
             'br_brand_url' => array(
                 'type' => 'url',
-                "label" => __( 'URL', 'brands-for-woocommerce' ),
-                'description' => __( 'Link to the brand page or to the external website', 'brands-for-woocommerce' ),
+                "label" => 'URL',
+                'description' => 'Link to the brand page or to the external website',
                 'default' => '',
             ),
-            // 'br_brand_color' => array(
-            //     'type' => 'color',
-            //     "label" => __( 'Color', 'brands-for-woocommerce' ),
-            //     'default' => '#000000',
-            // ),
         );
 
         $this->values = array(
@@ -212,10 +198,23 @@ class BeRocket_product_brand extends BeRocket_Framework {
             add_filter( 'wc_get_template', array($this, 'get_brands_template'), 10, 5 );
             add_filter( 'woocommerce_get_breadcrumb', array($this, 'remove_brand_crumb' ), 20, 2 );
             add_action( 'divi_extensions_init', array($this, 'divi_initialize_extension') );
-
         }
         add_filter('parent_file', array($this, 'select_menu'));
         add_filter('submenu_file', array($this, 'select_submenu'));
+    }
+    public function init_translation() {
+        $this->attributes['brand_image_url']["label"] = __( 'Thumbnail', 'brands-for-woocommerce' );
+        $this->attributes['brand_banner_url']["label"] = __( 'Banner', 'brands-for-woocommerce' );
+        $this->attributes['br_brand_category']["label"] = __( 'Categories', 'brands-for-woocommerce' );
+        $this->attributes['br_brand_category']["description"] = __( 'Product categories', 'brands-for-woocommerce' );
+        $this->attributes['br_brand_tooltip']["label"] = __( 'Tooltip', 'brands-for-woocommerce' );
+        $this->attributes['br_brand_tooltip']["description"] = __( 'Optional message to pop up on hover or on click', 'brands-for-woocommerce' );
+        $this->attributes['br_brand_related']["label"] = __( 'Related products', 'brands-for-woocommerce' );
+        $this->attributes['br_brand_related']["description"] = __( 'Products that may be related to this brand', 'brands-for-woocommerce' );
+        $this->attributes['br_brand_featured']["label"] = __( 'Featured', 'brands-for-woocommerce' );
+        $this->attributes['br_brand_featured']["description"] = __( 'Featured brands can be output first or you may select to show featured brands only', 'brands-for-woocommerce' );
+        $this->attributes['br_brand_url']["label"] = __( 'URL', 'brands-for-woocommerce' );
+        $this->attributes['br_brand_url']["description"] = __( 'Link to the brand page or to the external website', 'brands-for-woocommerce' );
     }
     public function init_validation() {
         return ( ( is_plugin_active( 'woocommerce/woocommerce.php' ) || is_plugin_active_for_network( 'woocommerce/woocommerce.php' ) ) && 

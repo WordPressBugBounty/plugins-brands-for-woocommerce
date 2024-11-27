@@ -15,18 +15,6 @@ class ET_Builder_Module_brands_products_list extends ET_Builder_Module {
 		$this->folder_name = 'et_pb_berocket_modules';
 		$this->main_css_element = '%%order_class%%';
 
-        $this->whitelisted_fields = array(
-            'per_page',
-            'columns',
-            'orderby',
-            'order',
-            'slider',
-            'hide_brands',
-            'hide_pagination',
-            'hide_labels',
-            'brands',
-        );
-
         $this->fields_defaults = array(
             'per_page'          => array('', 'add_default_setting'),
             'columns'           => array('4', 'add_default_setting'),

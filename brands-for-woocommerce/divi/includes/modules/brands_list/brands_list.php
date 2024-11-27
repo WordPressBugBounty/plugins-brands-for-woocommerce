@@ -15,35 +15,6 @@ class ET_Builder_Module_brands_list_2 extends ET_Builder_Module {
 		$this->folder_name = 'et_pb_berocket_modules';
 		$this->main_css_element = '%%order_class%%';
 
-        $this->whitelisted_fields = array(
-            'use_name',
-            'img_display',
-            'img_display',
-            'img_width',
-            'img_width_units',
-            'img_height',
-            'img_height_units',
-            'img_fit',
-            'img_align',
-            'orderby',
-            'order',
-            'count',
-            'hide_empty',
-            'out_of_stock',
-            'featured_first',
-            'slider',
-            'show_all',
-            'category_only',
-            'hierarchy',
-            'brl-brands_include',
-            'per_row',
-            'brands_number',
-            'padding',
-            'margin',
-            'border_width',
-            'border_color',
-        );
-
         $this->fields_defaults = array(
             'use_name'              => array('on'),
             'img_display'           => array( 'on', 'add_default_setting' ),

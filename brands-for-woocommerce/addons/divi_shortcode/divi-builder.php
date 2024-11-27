@@ -508,16 +508,6 @@ function berocket_apl_et_builder_ready() {
                 $this->slug       = 'et_pb_brands_by_name';
 	            $this->vb_support = 'partial';
 
-                $this->whitelisted_fields = array(
-                    'image',
-                    'imgh',
-                    'imgw',
-                    'text',
-                    'column',
-                    'position',
-                    'style',
-                );
-
                 $this->fields_defaults = array(
                     'image' => array('off'),
                     'imgh' => array( '64px', 'add_default_setting' ),
@@ -615,20 +605,6 @@ function berocket_apl_et_builder_ready() {
                 $this->name       = __( 'Brands List', 'brands-for-woocommerce' ) . '(DEPRECATED)';
                 $this->slug       = 'et_pb_brands_list';
 	            $this->vb_support = 'partial';
-
-                $this->whitelisted_fields = array(
-                    'use_image',
-                    'imgh',
-                    'text',
-                    'hide_empty',
-                    'slider',
-                    'per_row',
-                    'count',
-                    'orderby',
-                    'padding',
-                    'border_color',
-                    'border_width',
-                );
 
                 $this->fields_defaults = array(
                     'use_image' => array('on', 'add_default_setting'),
@@ -739,14 +715,6 @@ function berocket_apl_et_builder_ready() {
                 $this->name       = __( 'Brands Products', 'brands-for-woocommerce' ) . '(DEPRECATED)';
                 $this->slug       = 'et_pb_brands_products';
 
-                $this->whitelisted_fields = array(
-                    'brand_id',
-                    'brand_slug',
-                    'columns',
-                    'orderby',
-                    'order',
-                );
-
                 $this->fields_defaults = array(
                     'brand_id' => array('', 'add_default_setting'),
                     'brand_slug' => array('', 'add_default_setting'),
@@ -809,11 +777,6 @@ function berocket_apl_et_builder_ready() {
                 $this->name       = __( 'Brand info for product page', 'brands-for-woocommerce' ) . '(DEPRECATED)';
                 $this->slug       = 'et_pb_product_brands_info';
 
-                $this->whitelisted_fields = array(
-                    'type',
-                    'product_id',
-                );
-
                 $this->fields_defaults = array(
                     'type' => array('name,image,description', 'add_default_setting'),
                     'product_id' => array('', 'add_default_setting'),
@@ -850,11 +813,6 @@ function berocket_apl_et_builder_ready() {
                 $this->name       = __( 'Brand info', 'brands-for-woocommerce' ) . '(DEPRECATED)';
                 $this->slug       = 'et_pb_brands_info';
 
-                $this->whitelisted_fields = array(
-                    'type',
-                    'id',
-                );
-
                 $this->fields_defaults = array(
                     'type' => array('name,image,description', 'add_default_setting'),
                     'id' => array('', 'add_default_setting'),
@@ -890,14 +848,6 @@ function berocket_apl_et_builder_ready() {
             function init() {
                 $this->name       = __( 'Brand thumbnail', 'brands-for-woocommerce' ) . '(DEPRECATED)';
                 $this->slug       = 'et_pb_brands_product_thumbnail';
-                $this->fb_support = true;
-
-                $this->whitelisted_fields = array(
-                    'post_id',
-                    'width',
-                    'height',
-                    'position',
-                );
 
                 $this->fields_defaults = array(
                     'post_id' => array('', 'add_default_setting'),
