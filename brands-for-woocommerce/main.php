@@ -1556,7 +1556,9 @@ class BeRocket_product_brand extends BeRocket_Framework {
         return $new_crumbs;
     }
     public function divi_initialize_extension() {
-        require_once plugin_dir_path( __FILE__ ) . 'divi/includes/BrandExtension.php';
+        if( class_exists('DiviExtension') ) {
+            require_once plugin_dir_path( __FILE__ ) . 'divi/includes/BrandExtension.php';
+        }
     }
 }
 
