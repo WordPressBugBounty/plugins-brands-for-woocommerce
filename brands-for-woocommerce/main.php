@@ -1349,7 +1349,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
             }
         }
         if ( version_compare( $previous, '3.8.1', '<' ) ) {
-            if( ! is_array($options['addons']) ) {
+            if( isset($options['addons']) && ! is_array($options['addons']) ) {
                 $options['addons'] = array();
             }
             if( ! in_array(DIRECTORY_SEPARATOR . 'divi_shortcode' . DIRECTORY_SEPARATOR . 'divi_shortcode.php', $options['addons']) ) {
@@ -1417,10 +1417,16 @@ class BeRocket_product_brand extends BeRocket_Framework {
     }
 
     public function set_to_cache( $key, $terms ) {
+        $options = $this->get_option();
+        if( empty( $options['use_cache'] ) ) {
+            return;
+        }
         set_transient( $key, $terms, $this->cache_time );
         $cache_list = get_transient( $this->cache_list );
         if ( is_array( $cache_list ) ) {
-            $cache_list[] = $key;
+            if( ! in_array($key, $cache_list) ) {
+                $cache_list[] = $key;
+            }
         } else {
             $cache_list = array( $key );
         }
@@ -1453,7 +1459,12 @@ class BeRocket_product_brand extends BeRocket_Framework {
         wp_die();
     }
 
-    public function clear_cache( $needle = '' ) {
+    public $cache_cleared = false;
+    public function clear_cache( $needle = '', $force = false ) {
+        $options = $this->get_option();
+        if( ! $force && (empty( $options['use_cache'] ) || empty( $needle ) && $this->cache_cleared) ) {
+            return;
+        }
         $cache_list = get_transient( $this->cache_list );
         if ( empty( $cache_list ) || !is_array( $cache_list ) ) return;
 
@@ -1462,6 +1473,10 @@ class BeRocket_product_brand extends BeRocket_Framework {
                 delete_transient( $cache_key );
             }
         }
+        if( empty( $needle ) ) {
+            $this->cache_cleared = true;
+            delete_transient($this->cache_list);
+        }
     }
 
     public function clear_cache_ajax() {
@@ -1469,7 +1484,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
         if( ! wp_verify_nonce($nonce, 'br_brands_clear_cache') ) {
             wp_die();
         }
-        $this->clear_cache();
+        $this->clear_cache('', true);
         wp_die();
     }
 
