@@ -1349,7 +1349,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
             }
         }
         if ( version_compare( $previous, '3.8.1', '<' ) ) {
-            if( isset($options['addons']) && ! is_array($options['addons']) ) {
+            if( ! isset($options['addons']) || ! is_array($options['addons']) ) {
                 $options['addons'] = array();
             }
             if( ! in_array(DIRECTORY_SEPARATOR . 'divi_shortcode' . DIRECTORY_SEPARATOR . 'divi_shortcode.php', $options['addons']) ) {
@@ -1529,7 +1529,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
     }
 
     public function brand_product_export_column_names( $columns ) {
-        $columns[ self::$taxonomy_name ] = __( 'Brands', 'brands-for-woocommerce' );
+        $columns[ self::$taxonomy_name ] = __( 'Brands BeRocket', 'brands-for-woocommerce' );
         return $columns;
     }
 
@@ -1541,6 +1541,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
     }
 
     public function brand_product_import_mapping_default_columns( $columns ) {
+        $columns[ __( 'Brands BeRocket', 'brands-for-woocommerce' ) ] = self::$taxonomy_name;
         $columns[ __( 'Brands', 'brands-for-woocommerce' ) ] = self::$taxonomy_name;
         $columns[ 'Brands' ] = self::$taxonomy_name; // Always add English mappings.
         return $columns;

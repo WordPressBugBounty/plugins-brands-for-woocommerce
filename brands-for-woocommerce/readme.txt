@@ -5,7 +5,7 @@ Donate link: https://berocket.com/?utm_source=wordpress_org&utm_medium=donate&ut
 Tags: brands, manufacturer, supplier, product brand, brands for products, woocommerce brands, woocommerce manufacturer, woocommerce supplier, wc brands, wc product brands, wc showcase brands, brand page, widget, plugin, brands plugin, brands widget, brands slider, slider with brands, showcase brands, page for brands, brands page plugin, brands images display, berocket, berocket brands for woocommerce
 Requires at least: 5.0
 Tested up to: 6.8
-Stable tag: 3.8.6.1
+Stable tag: 3.8.6.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,11 @@ If none of the previous listed actions helps you to solve the problem, then, sub
 ---
 
 == Changelog ==
+
+= 3.8.6.2 =
+* Enhancement - Compatibility version: WooCommerce 10.1
+* Fix - Import/export with new WooCommerce
+* Fix - Error on activation
 
 = 3.8.6.1 =
 * Enhancement - Compatibility version: WooCommerce 10.0
