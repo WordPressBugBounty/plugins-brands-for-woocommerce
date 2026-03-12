@@ -372,6 +372,9 @@ class BeRocket_product_brand extends BeRocket_Framework {
         $options = $this->get_option();
 
         BeRocket_tooltip_display::$load_tippy = true;
+        add_action('wp_footer', array($this, 'load_scripts_in_footer'), 10);
+    }
+    public function load_scripts_in_footer() {
         wp_register_style( 'berocket_slick', plugins_url( 'css/slick.css', __FILE__ ) );
         wp_register_script( 'berocket_slick', plugins_url( 'js/slick.min.js', __FILE__ ), array( 'jquery' ) );
         wp_register_script( 'br_brands_slider', plugins_url( 'js/slider.js', __FILE__ ), array( 'berocket_slick', 'jquery' ) );
@@ -1188,24 +1191,6 @@ class BeRocket_product_brand extends BeRocket_Framework {
                 ),
             ),
             'CSS'     => array(
-                'global_font_awesome_disable' => array(
-                    "label"     => __( 'Disable Font Awesome', "brands-for-woocommerce" ),
-                    "type"      => "checkbox",
-                    "name"      => "fontawesome_frontend_disable",
-                    "value"     => $this->defaults['global_font_awesome_disable'],
-                    'label_for' => __('Don\'t loading css file for Font Awesome on site front end. Use it only if you doesn\'t uses Font Awesome icons in widgets or you have Font Awesome in your theme.', 'brands-for-woocommerce'),
-                ),
-                'global_fontawesome_version' => array(
-                    "label"    => __( 'Font Awesome Version', "brands-for-woocommerce" ),
-                    "name"     => "fontawesome_frontend_version",
-                    "type"     => "selectbox",
-                    "options"  => array(
-                        array('value' => '', 'text' => __('Font Awesome 4', 'brands-for-woocommerce')),
-                        array('value' => 'fontawesome5', 'text' => __('Font Awesome 5', 'brands-for-woocommerce')),
-                    ),
-                    "value"    => $this->defaults['global_fontawesome_version'],
-                    "label_for" => __('Version of Font Awesome that will be used on front end. Please select version that you have in your theme', 'brands-for-woocommerce'),
-                ),
                 array(
                     "type"  => "textarea",
                     "label" => __('Custom CSS', 'brands-for-woocommerce'),

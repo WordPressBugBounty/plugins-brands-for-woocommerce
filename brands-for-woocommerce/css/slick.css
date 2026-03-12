@@ -109,11 +109,15 @@
 }
 .slick-track:after
 {
-    clear: both;
+    clear: both !important;
 }
 .slick-loading .slick-track
 {
     visibility: hidden;
+}
+
+.slick-list .slick-track li.product {
+    clear: none!important;
 }
 
 .brcs_slider_brands .slick-slide,
@@ -222,7 +226,7 @@
 }
 
 .unslider .brcs_slider_brands .unslider-wrap li {
-    clear: none;
+    clear: none !important;
 }
 
 

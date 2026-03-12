@@ -159,7 +159,14 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
     protected function form_query( $atts ) {
         // raw query to order taxonomy terms by multiple meta values
         global $wpdb, $wp_query;
-        $hide_empty = empty( $atts['hide_empty'] ) ? '' : "AND tt.count <> ''";
+
+        $wc_term_ids = wc_get_product_visibility_term_ids();
+        $hide_empty = empty( $atts['hide_empty'] ) ? '' : " AND tt.count <> '' AND tm_hidden.object_id NOT IN (
+            SELECT object_id
+            FROM {$wpdb->prefix}term_relationships
+            WHERE term_taxonomy_id IN (" . $wc_term_ids['exclude-from-catalog'] . ")
+        )";
+        $hide_empty_join = empty( $atts['hide_empty'] ) ? '' : " LEFT JOIN {$wpdb->prefix}term_relationships AS tm_hidden ON tt.term_taxonomy_id = tm_hidden.term_taxonomy_id";
         $match_id_list = '/^[0-9, .]*$/';
         
         $exclude = empty( $atts['exclude'] ) || !preg_match( $match_id_list, $atts['exclude'] ) ? '' : "AND t.term_id NOT IN ({$atts['exclude']})";
@@ -173,16 +180,20 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
             $brands_terms_id = array(0);
         }
         $include = ( empty( $include ) ? '' : $include . ' ') . 'AND t.term_id IN ('.implode(',', $brands_terms_id).')';
-        
+
         $query = array(
-            'select' => "SELECT t.slug, tt.description, t.term_id, t.name, tt.count, tm_image.meta_value as image, tm_tooltip.meta_value AS tooltip",
+            'select' => "SELECT ANY_VALUE(t.slug) as slug, ANY_VALUE(tt.description) as description, 
+                        ANY_VALUE(t.term_id) as term_id, ANY_VALUE(t.name) as name, ANY_VALUE(tt.count) count, 
+                        ANY_VALUE(tm_image.meta_value) as image, ANY_VALUE(tm_tooltip.meta_value) AS tooltip",
             'from' => "FROM {$wpdb->prefix}terms AS t
                 LEFT JOIN {$wpdb->prefix}term_taxonomy AS tt ON t.term_id = tt.term_id
                 LEFT JOIN {$wpdb->prefix}termmeta AS tm_image ON t.term_id = tm_image.term_id AND tm_image.meta_key='brand_image_url'
-                LEFT JOIN {$wpdb->prefix}termmeta AS tm_tooltip ON t.term_id = tm_tooltip.term_id AND tm_tooltip.meta_key='br_brand_tooltip'",
+                LEFT JOIN {$wpdb->prefix}termmeta AS tm_tooltip ON t.term_id = tm_tooltip.term_id AND tm_tooltip.meta_key='br_brand_tooltip'
+                {$hide_empty_join}",
             'orderby' => array(),
             'where' => "WHERE tt.taxonomy='$taxonomy' $include $exclude $hide_empty",
             'limit' => '',
+            'group' => 'GROUP BY tt.term_taxonomy_id'
         );
 
         if ( !empty( $atts['hierarchy'] ) ) {
@@ -325,7 +336,7 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
         $cached_terms = $BeRocket_product_brand->get_from_cache( $atts['cache_key'] );
         if( !empty( $cached_terms ) ) {
             // bd('from cache');
-            return $cached_terms;
+            //return $cached_terms;
         } 
         // else {
         //     bd('from cache');            
