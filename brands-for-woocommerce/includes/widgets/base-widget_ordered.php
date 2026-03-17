@@ -240,8 +240,9 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
         }
 
         if ( !empty( $atts['featured_first'] ) ) {
+            $query['select'] .= ', ANY_VALUE(tm_featured.meta_value) as featured';
             $query['from'] .= " LEFT JOIN {$wpdb->prefix}termmeta AS tm_featured ON t.term_id = tm_featured.term_id AND tm_featured.meta_key='br_brand_featured'";
-            $query['orderby'][] = "cast(tm_featured.meta_value AS unsigned) DESC";
+            $query['orderby'][] = "cast(featured AS unsigned) DESC";
         }
 
         switch ( $atts['orderby'] ) {
@@ -250,26 +251,27 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
                 break;
 
             case 'order':
+                $query['select'] .= ', ANY_VALUE(tm_order.meta_value) as order_val';
                 $query['from'] .= " LEFT JOIN {$wpdb->prefix}termmeta AS tm_order ON t.term_id = tm_order.term_id AND tm_order.meta_key='br_brand_order'";
-                $query['orderby'][] = "cast(tm_order.meta_value as unsigned) $order, t.name ASC";
+                $query['orderby'][] = "cast(order_val as unsigned) $order, t.name ASC";
                 break;
 
             case 'count':
             case 'products':
-                $query['orderby'][] = "tt.count $order, t.name ASC";
+                $query['orderby'][] = "count $order, name ASC";
                 break;
 
             case 'alphabet':
             case 'name':
-                $query['orderby'][] = "t.name $order";
+                $query['orderby'][] = "name $order";
                 break;
 
             case 'slug':
-                $query['orderby'][] = "t.slug $order";
+                $query['orderby'][] = "slug $order";
                 break;
 
             case 'description':
-                $query['orderby'][] = "tt.description $order";
+                $query['orderby'][] = "description $order";
                 break;
 
             default:
@@ -345,9 +347,8 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
         global $wpdb;
         $query = $this->form_query( $atts );
         $orderby = empty( $query['orderby'] ) ? '' : 'ORDER BY ' . implode( ', ', $query['orderby'] );
-        // bd("{$query['select']} {$query['from']} {$query['where']} $orderby {$query['limit']}");
-        
-        $terms = $wpdb->get_results( "{$query['select']} {$query['from']} {$query['where']} $orderby {$query['limit']}" );
+        // bd("{$query['select']} {$query['from']} {$query['where']} {$query['group']} $orderby {$query['limit']}");
+        $terms = $wpdb->get_results( "{$query['select']} {$query['from']} {$query['where']} {$query['group']} $orderby {$query['limit']}" );
         if( empty( $terms ) || !is_array($terms) ) return array();
         if ( !empty( $atts['out_of_stock'] ) ) {
             foreach ( $terms as $i => $term ) {
