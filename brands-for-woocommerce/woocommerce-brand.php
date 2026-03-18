@@ -3,7 +3,7 @@
  * Plugin Name: Brands for WooCommerce
  * Plugin URI: https://wordpress.org/plugins/brands-for-woocommerce/
  * Description: Brands are a guarantee for quality, they assure product recognition in customers. WooCommerce Product Brands will help you to showcase them.
- * Version: 3.8.6.6
+ * Version: 3.8.6.7
  * Author: BeRocket
  * Requires at least: 5.0
  * Tested up to: 6.9.3
@@ -14,6 +14,6 @@
  * Domain Path: /languages/
  * WC tested up to: 10.6
  */
-define( "BeRocket_product_brand_version", '3.8.6.6' );
+define( "BeRocket_product_brand_version", '3.8.6.7' );
 define( "BeRocket_product_brand_file", __FILE__ );
 include_once('main.php');

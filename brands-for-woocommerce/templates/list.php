@@ -1,6 +1,5 @@
 <?php 
 $widget_number = $atts['cache_key'];
-error_log($atts['per_row']);
 $per_row = empty( $atts['per_row'] ) ? 3 : intval( $atts['per_row'] ); 
 if( $per_row < 1 ) {
     $per_row = 1;

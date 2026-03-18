@@ -182,9 +182,9 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
         $include = ( empty( $include ) ? '' : $include . ' ') . 'AND t.term_id IN ('.implode(',', $brands_terms_id).')';
 
         $query = array(
-            'select' => "SELECT ANY_VALUE(t.slug) as slug, ANY_VALUE(tt.description) as description, 
-                        ANY_VALUE(t.term_id) as term_id, ANY_VALUE(t.name) as name, ANY_VALUE(tt.count) count, 
-                        ANY_VALUE(tm_image.meta_value) as image, ANY_VALUE(tm_tooltip.meta_value) AS tooltip",
+            'select' => "SELECT MIN(t.slug) as slug, MIN(tt.description) as description, 
+                        MIN(t.term_id) as term_id, MIN(t.name) as name, MIN(tt.count) count, 
+                        MIN(tm_image.meta_value) as image, MIN(tm_tooltip.meta_value) AS tooltip",
             'from' => "FROM {$wpdb->prefix}terms AS t
                 LEFT JOIN {$wpdb->prefix}term_taxonomy AS tt ON t.term_id = tt.term_id
                 LEFT JOIN {$wpdb->prefix}termmeta AS tm_image ON t.term_id = tm_image.term_id AND tm_image.meta_key='brand_image_url'
@@ -240,7 +240,7 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
         }
 
         if ( !empty( $atts['featured_first'] ) ) {
-            $query['select'] .= ', ANY_VALUE(tm_featured.meta_value) as featured';
+            $query['select'] .= ', MIN(tm_featured.meta_value) as featured';
             $query['from'] .= " LEFT JOIN {$wpdb->prefix}termmeta AS tm_featured ON t.term_id = tm_featured.term_id AND tm_featured.meta_key='br_brand_featured'";
             $query['orderby'][] = "cast(featured AS unsigned) DESC";
         }
@@ -251,7 +251,7 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
                 break;
 
             case 'order':
-                $query['select'] .= ', ANY_VALUE(tm_order.meta_value) as order_val';
+                $query['select'] .= ', MIN(tm_order.meta_value) as order_val';
                 $query['from'] .= " LEFT JOIN {$wpdb->prefix}termmeta AS tm_order ON t.term_id = tm_order.term_id AND tm_order.meta_key='br_brand_order'";
                 $query['orderby'][] = "cast(order_val as unsigned) $order, t.name ASC";
                 break;
