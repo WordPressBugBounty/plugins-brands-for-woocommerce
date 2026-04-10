@@ -46,10 +46,7 @@ class BeRocket_product_list_Widget extends BeRocket_Base_Product_List_Widget {
 
         $BeRocket_product_brand = BeRocket_product_brand::getInstance();
         //$products = $BeRocket_product_brand->get_from_cache( $instance['cache_key'] );
-        $products = [];
-        if ( is_string( $products ) ) {
-            $products = json_decode( $products );
-        }
+        $products = array();
 
         if ( empty( $instance['per_page'] ) ) {
             $instance['per_page'] = -1;

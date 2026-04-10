@@ -62,7 +62,7 @@ class BeRocket_Product_Brands_Info_Widget extends BeRocket_Base_Brand_Descriptio
                 }
             }
         }
-        if ( empty( count($products_id) > 0 ) ) return;
+        if ( count( $products_id ) === 0 ) return;
 
         $meta_args = empty( $instance['featured'] ) ? array() : 
             array(
@@ -132,7 +132,9 @@ class BeRocket_Product_Brands_Info_Widget extends BeRocket_Base_Brand_Descriptio
         $BeRocket_product_brand = BeRocket_product_brand::getInstance();
         $options = $BeRocket_product_brand->get_option();
         $options = array_merge($options, $instance);
-        if ( empty( $options['link_text'] ) ) $options['link_text'] = $this->defaults['link_text'];
+        if ( empty( $options['link_text'] ) ) {
+            $options['link_text'] = empty( $this->defaults['link_text'] ) ? '' : $this->defaults['link_text'];
+        }
         $options['link_text'] = sanitize_text_field($options['link_text']);
 
         set_query_var( 'options', $options );

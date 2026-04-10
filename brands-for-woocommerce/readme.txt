@@ -4,8 +4,8 @@ Contributors: dholovnia, berocket
 Donate link: https://berocket.com/?utm_source=wordpress_org&utm_medium=donate&utm_campaign=product_brand
 Tags: brands, manufacturer, supplier, product brand, brands for products, woocommerce brands, woocommerce manufacturer, woocommerce supplier, wc brands, wc product brands, wc showcase brands, brand page, widget, plugin, brands plugin, brands widget, brands slider, slider with brands, showcase brands, page for brands, brands page plugin, brands images display, berocket, berocket brands for woocommerce
 Requires at least: 5.0
-Tested up to: 6.9.3
-Stable tag: 3.8.6.7
+Tested up to: 6.9.4
+Stable tag: 3.8.6.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,14 @@ If none of the previous listed actions helps you to solve the problem, then, sub
 ---
 
 == Changelog ==
+
+= 3.8.6.8 =
+* Enhancement - Compatibility with other BeRocket plugins
+* Fix - Updater PHP error
+* Fix - Query for mariaDB
+* Fix - Widget errors
+* Fix - Slider script
+* Fix - Order brands functionality
 
 = 3.8.6.7 =
 * Fix - Issue with shortcodes and widgets for MariaDB database

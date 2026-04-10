@@ -32,7 +32,7 @@ if ( ! class_exists( 'BeRocket_product_brand_widget' ) ) {
 				)
 			);
 
-			foreach ( array( 'show_expanded', 'expand_by_click' ) as $key ) {
+			foreach ( array( 'expand', 'by_click' ) as $key ) {
 				$this->form_fields['hierarchy']['options'][ $key ]['class'] = 'slider_hide_depending';
 			}
 
@@ -83,8 +83,8 @@ if ( ! class_exists( 'BeRocket_product_brand_widget' ) ) {
 		protected function form_query( $atts ) {
 			global $wpdb;
 			if ( ! empty( $atts['slider'] ) && $atts['slider'] == 1 ) {
-				if ( ! empty( $atts['hierarchy'] ) && in_array( $atts['hierarchy'], array(
-						'expanded',
+					if ( ! empty( $atts['hierarchy'] ) && in_array( $atts['hierarchy'], array(
+						'expand',
 						'by_click'
 					) ) ) {
 					$atts['hierarchy'] = 'all';

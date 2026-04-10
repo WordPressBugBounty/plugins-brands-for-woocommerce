@@ -6,6 +6,7 @@ require_once(plugin_dir_path( __FILE__ ).'berocket/framework.php');
 foreach ( glob( __DIR__ . "/includes/*.php" ) as $filename ) {
     include_once($filename);
 }
+include_once(plugin_dir_path( __FILE__ ) . "includes/admin/funnels.php");
 
 class BeRocket_product_brand extends BeRocket_Framework {
     public static $settings_name = 'br-product_brand-options', $taxonomy_name = 'berocket_brand';
@@ -375,14 +376,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
         add_action('wp_footer', array($this, 'load_scripts_in_footer'), 10);
     }
     public function load_scripts_in_footer() {
-        wp_register_style( 'berocket_slick', plugins_url( 'css/slick.css', __FILE__ ) );
-        wp_register_script( 'berocket_slick', plugins_url( 'js/slick.min.js', __FILE__ ), array( 'jquery' ) );
-        wp_register_script( 'br_brands_slider', plugins_url( 'js/slider.js', __FILE__ ), array( 'berocket_slick', 'jquery' ) );
-        wp_register_script( 'br_brands_catalog', plugins_url( 'js/catalog.js', __FILE__ ), array( 'jquery' ) );
-        wp_register_style( 'berocket_product_brand_style', plugins_url( 'css/frontend.css', __FILE__ ), 
-            "", BeRocket_product_brand_version );
-        wp_register_script( 'berocket_front', plugins_url( 'js/front.js',  __FILE__ ), 
-            array( 'berocket_framework_tippy', 'jquery' ) );
+        brfr_register_front_assets();
 
         wp_enqueue_style( 'berocket_product_brand_style' );
         wp_enqueue_style( 'berocket_tippy' );
@@ -561,7 +555,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
             $next_title   = __( 'Level down', 'brands-for-woocommerce' );
             $nonce        = wp_create_nonce('br_brands_save_order');
             return 
-                "<a href='#order-up' class='berocket_post_set_new_sortable br_brand_order' title='$prev_title'>
+                "<div class='berocket_brand_sortable_tax'><a href='#order-up' class='berocket_post_set_new_sortable br_brand_order' title='$prev_title'>
                     <i class='fa fa-arrow-up'></i>
                 </a>
                 <span class='berocket_post_set_new_sortable_input'>
@@ -572,7 +566,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
                 <a href='#order-down' class='berocket_post_set_new_sortable br_brand_order' title='$next_title'>
                     <i class='fa fa-arrow-down'></i>
                 </a>
-                <i class='fa fa-bars ui-sortable-handle br-brands-sortable-handler'></i>";
+                <i class='fa fa-bars ui-sortable-handle br-brands-sortable-handler'></i></div>";
 
             // return $value = '<span class="br-sorted-holder"><i class="fas fa-arrows-alt-v"></i></span>' . get_term_meta( $term_id, 'br_brand_order', true );
         }

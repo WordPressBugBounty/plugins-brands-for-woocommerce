@@ -39,7 +39,7 @@ var brBrandSliderInit;
             brBrandInitSliderElement($(this), $(this).parents('.br_product_list_slider').first().data());
         });
     }
-    $(document).ready( brBrandSliderInit );
+    $(document).on( 'ready', brBrandSliderInit );
     $( document ).on( "ajaxComplete", brBrandSliderInit );
     document.addEventListener("br_update_et_pb_brands_products_list", brBrandSliderInit);
 })(jQuery);

@@ -100,11 +100,14 @@ if ( ! class_exists( 'BeRocket_alphabet_brand_widget' ) ) {
         }
 
         protected function filter_for_category( $category, $ordered_terms ) {
-
             foreach ( $ordered_terms['all_terms'] as $index => $term ) {
                 if ( strpos( $term->category, $category ) === false ) {
                     unset( $ordered_terms['all_terms'][$index] );
-                    unset( $ordered_terms['sorted_id'][$term->name[0]][$index] );
+                    foreach ( $ordered_terms['sorted_id'] as $key => $grouped_terms ) {
+                        if ( isset( $grouped_terms[$index] ) ) {
+                            unset( $ordered_terms['sorted_id'][$key][$index] );
+                        }
+                    }
                 }
             }
 

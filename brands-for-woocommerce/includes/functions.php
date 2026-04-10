@@ -99,7 +99,29 @@ function brfr_select_units( $property, $default = 'px', $class = '', $extra = ''
     );
 }
 
+function brfr_register_front_assets() {
+    if ( ! wp_style_is( 'berocket_slick', 'registered' ) ) {
+        wp_register_style( 'berocket_slick', plugins_url( '../css/slick.css', __FILE__ ) );
+    }
+    if ( ! wp_script_is( 'berocket_slick', 'registered' ) ) {
+        wp_register_script( 'berocket_slick', plugins_url( '../js/slick.min.js', __FILE__ ), array( 'jquery' ) );
+    }
+    if ( ! wp_script_is( 'br_brands_slider', 'registered' ) ) {
+        wp_register_script( 'br_brands_slider', plugins_url( '../js/slider.js', __FILE__ ), array( 'berocket_slick', 'jquery' ) );
+    }
+    if ( ! wp_script_is( 'br_brands_catalog', 'registered' ) ) {
+        wp_register_script( 'br_brands_catalog', plugins_url( '../js/catalog.js', __FILE__ ), array( 'jquery' ) );
+    }
+    if ( ! wp_style_is( 'berocket_product_brand_style', 'registered' ) ) {
+        wp_register_style( 'berocket_product_brand_style', plugins_url( '../css/frontend.css', __FILE__ ), "", BeRocket_product_brand_version );
+    }
+    if ( ! wp_script_is( 'berocket_front', 'registered' ) ) {
+        wp_register_script( 'berocket_front', plugins_url( '../js/front.js', __FILE__ ), array( 'berocket_framework_tippy', 'jquery' ) );
+    }
+}
+
 function brfr_add_slider_script( $options, $class ) {
+    brfr_register_front_assets();
     if ( !wp_script_is( 'berocket_slick' ) ) {
         wp_enqueue_script( 'berocket_slick' );
     }
@@ -121,8 +143,8 @@ function brfr_add_slider_script( $options, $class ) {
         foreach($options_name as $option_name => $default_val) {
             $options_ready[$option_name] = ( isset($options[$option_name]) ? $options[$option_name] : $default_val );
         }
-        wp_enqueue_script( 'br_brands_slider' );
         wp_localize_script( 'br_brands_slider', 'bdBrandSlider', $options_ready );
+        wp_enqueue_script( 'br_brands_slider' );
     }
     if ( !wp_style_is( 'berocket_slick' ) ) {
         wp_enqueue_style( 'berocket_slick' );

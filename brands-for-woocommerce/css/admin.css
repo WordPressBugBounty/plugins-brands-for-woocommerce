@@ -223,27 +223,29 @@
 }
 
 .taxonomy-berocket_brand .column-order {
-    width: 131px;
+    width: 140px;
 }
 
 .taxonomy-berocket_brand .column-slug {
     width: auto;
 }
 
+.berocket_brand_sortable_tax {
+    display: flex;
+    align-items: center;
+}
+
+.taxonomy-berocket_brand .berocket_post_set_new_sortable_input input {
+    padding-right: 18px!important;
+    width: 55px;
+}
+
+.taxonomy-berocket_brand  .berocket_post_set_new_sortable .fa {
+    width: 20px;
+}
 .taxonomy-berocket_brand .column-order .berocket_post_set_new_sortable_input {
     display: inline-block;
     position: relative;
-}
-
-.taxonomy-berocket_brand .column-order .berocket_post_set_new_sortable_input input {
-    padding-right: 20px;
-    width: 65px;
-}
-
-.taxonomy-berocket_brand .column-order .berocket_post_set_new_sortable_input .berocket_post_set_new_sortable_set {
-    position: absolute;
-    right: 9px;
-    top: 9px;
 }
 
 .taxonomy-berocket_brand .column-order .berocket_post_set_new_sortable_input .br_brand_order_wait {

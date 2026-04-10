@@ -235,14 +235,16 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
                     $brands_include_checked[] = sanitize_title_for_query(trim($brand_include));
                 }
             }
-            $query['where'] .= " AND t.name IN ('" . implode("','", $brands_include_checked) . "')";
+            if ( ! empty( $brands_include_checked ) ) {
+                $query['where'] .= " AND t.slug IN ('" . implode( "','", array_map( 'esc_sql', $brands_include_checked ) ) . "')";
+            }
             // $query['where'] .= " AND t.term_id IN ('" . implode( "', '", unserialize( $atts['brands_include'] ) ) . "')";
         }
 
         if ( !empty( $atts['featured_first'] ) ) {
             $query['select'] .= ', MIN(tm_featured.meta_value) as featured';
             $query['from'] .= " LEFT JOIN {$wpdb->prefix}termmeta AS tm_featured ON t.term_id = tm_featured.term_id AND tm_featured.meta_key='br_brand_featured'";
-            $query['orderby'][] = "cast(featured AS unsigned) DESC";
+            $query['orderby'][] = "cast(MIN(tm_featured.meta_value) AS unsigned) DESC";
         }
 
         switch ( $atts['orderby'] ) {
@@ -253,7 +255,7 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
             case 'order':
                 $query['select'] .= ', MIN(tm_order.meta_value) as order_val';
                 $query['from'] .= " LEFT JOIN {$wpdb->prefix}termmeta AS tm_order ON t.term_id = tm_order.term_id AND tm_order.meta_key='br_brand_order'";
-                $query['orderby'][] = "cast(order_val as unsigned) $order, t.name ASC";
+                $query['orderby'][] = "cast(MIN(tm_order.meta_value) as unsigned) $order, t.name ASC";
                 break;
 
             case 'count':
@@ -283,7 +285,7 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
 
     protected function form_query_add_category( $query, $atts ) {
         global $wpdb;
-        $query['select'] .= ", tm_cat.meta_value as category";
+        $query['select'] .= ", MIN(tm_cat.meta_value) as category";
         $query['from'] .= " LEFT JOIN {$wpdb->prefix}termmeta AS tm_cat ON t.term_id = tm_cat.term_id AND tm_cat.meta_key='br_brand_category'";
         return $query;
     }
