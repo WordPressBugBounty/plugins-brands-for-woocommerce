@@ -2,10 +2,10 @@
 Plugin Name: Brands for WooCommerce
 Contributors: dholovnia, berocket
 Donate link: https://berocket.com/?utm_source=wordpress_org&utm_medium=donate&utm_campaign=product_brand
-Tags: brands, manufacturer, supplier, product brand, brands for products, woocommerce brands, woocommerce manufacturer, woocommerce supplier, wc brands, wc product brands, wc showcase brands, brand page, widget, plugin, brands plugin, brands widget, brands slider, slider with brands, showcase brands, page for brands, brands page plugin, brands images display, berocket, berocket brands for woocommerce
+Tags: brands, woocommerce, product brands, taxonomy, widget
 Requires at least: 5.0
 Tested up to: 6.9.4
-Stable tag: 3.8.6.8
+Stable tag: 3.8.6.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,6 +14,11 @@ Brands for WooCommerce plugin allows you to add brands for products in your shop
 == Description ==
 
 Brands for WooCommerce plugin allows you to add brands for products in your shop. Each brand has a name, description, thumbnail, banner, rating, products category, tooltip, and checkbox 'Featured'.
+
+= 🚀 Spring Premium Days is LIVE! =
+**Save 30%** on Pro features across BeRocket plugins. 
+*Boost your store performance and UX with our exclusive seasonal offer.*
+🌿 Improve your store today. [**Limited time offer!**](https://berocket.com/plugins/?utm_source=free_plugin&utm_medium=wporg&utm_campaign=spring_2026&utm_content=top_ad_cta&utm_term=brands)
 
 = Features: =
 &#9989; Custom images for brands: thumbnail and banner
@@ -101,6 +106,10 @@ If none of the previous listed actions helps you to solve the problem, then, sub
 ---
 
 == Changelog ==
+
+= 3.8.6.9 =
+* Enhancement - Compatibility version: Wordpress 6.9.4 and WooCommerce 10.6.2
+* Fix - PHP warning in admin area
 
 = 3.8.6.8 =
 * Enhancement - Compatibility with other BeRocket plugins
