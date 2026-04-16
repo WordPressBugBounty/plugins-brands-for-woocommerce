@@ -96,7 +96,8 @@ var br_savin_ajax = false;
         });
         $('.br_has_dependent_options').trigger('change');
 
-        $(document).on('click', '.br_brand_order', function() {
+        $(document).on('click', '.br_brand_order', function(event) {
+            event.preventDefault();
             var self = $(this), 
                 input = self.closest('td').find('.br_brand_order_input'),
                 order = parseInt( input.val() ),
@@ -108,7 +109,7 @@ var br_savin_ajax = false;
         $(document).on('click', '.br_brand_order_save', function() {
             var 
                 self = $(this),
-                parent = self.closest('.berocket_post_set_new_sortable_input'),
+                parent = self.closest('.berocket_tax_set_new_sortable_input'),
                 save_button = parent.find('.br_brand_order_save'),
                 waiting_title = parent.find('.br_brand_order_wait');
 

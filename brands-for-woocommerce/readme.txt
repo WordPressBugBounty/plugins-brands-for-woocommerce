@@ -5,7 +5,7 @@ Donate link: https://berocket.com/?utm_source=wordpress_org&utm_medium=donate&ut
 Tags: brands, woocommerce, product brands, taxonomy, widget
 Requires at least: 5.0
 Tested up to: 6.9.4
-Stable tag: 3.8.6.9
+Stable tag: 3.8.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,6 +106,11 @@ If none of the previous listed actions helps you to solve the problem, then, sub
 ---
 
 == Changelog ==
+
+= 3.8.7 =
+* Enhancement - Compatibility version: WooCommerce 10.7
+* Fix - Plugins notice mark on BeRocket element
+* Fix - Brands order functionality
 
 = 3.8.6.9 =
 * Enhancement - Compatibility version: Wordpress 6.9.4 and WooCommerce 10.6.2

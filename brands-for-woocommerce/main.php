@@ -555,15 +555,16 @@ class BeRocket_product_brand extends BeRocket_Framework {
             $next_title   = __( 'Level down', 'brands-for-woocommerce' );
             $nonce        = wp_create_nonce('br_brands_save_order');
             return 
-                "<div class='berocket_brand_sortable_tax'><a href='#order-up' class='berocket_post_set_new_sortable br_brand_order' title='$prev_title'>
+                "<div class='berocket_brand_sortable_tax'>
+                <a href='#order-up' class='berocket_tax_set_new_sortable br_brand_order' title='$prev_title'>
                     <i class='fa fa-arrow-up'></i>
                 </a>
-                <span class='berocket_post_set_new_sortable_input'>
+                <span class='berocket_tax_set_new_sortable_input'>
                     <input class='br_brand_order_input' type='number' min='0' value='$order' />
-                    <a class='berocket_post_set_new_sortable_set br_brand_order_save fa fa-arrow-circle-right' data-nonce='{$nonce}' data-term_id='$term_id' href='#order-set' title='$save_title'></a>
+                    <a class='berocket_tax_set_new_sortable_set br_brand_order_save fa fa-arrow-circle-right' data-nonce='{$nonce}' data-term_id='$term_id' href='#order-set' title='$save_title'></a>
                     <div class='br_brand_order_wait'>$saving_title</div>
                 </span>
-                <a href='#order-down' class='berocket_post_set_new_sortable br_brand_order' title='$next_title'>
+                <a href='#order-down' class='berocket_tax_set_new_sortable br_brand_order' title='$next_title'>
                     <i class='fa fa-arrow-down'></i>
                 </a>
                 <i class='fa fa-bars ui-sortable-handle br-brands-sortable-handler'></i></div>";
@@ -1427,7 +1428,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
 
     public function save_all_orders() {
         $nonce = (empty($_REQUEST['nonce']) ? '' : $_REQUEST['nonce']);
-        if( ! wp_verify_nonce($nonce, 'br_brands_save_order') ) {
+        if( ! wp_verify_nonce($nonce, 'br_brands_admin') ) {
             wp_die();
         }
         foreach ( $_REQUEST['term_ids'] as $order => $term_id ) {

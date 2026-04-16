@@ -235,20 +235,31 @@
     align-items: center;
 }
 
-.taxonomy-berocket_brand .berocket_post_set_new_sortable_input input {
+.taxonomy-berocket_brand .berocket_tax_set_new_sortable_input input {
     padding-right: 18px!important;
     width: 55px;
 }
 
-.taxonomy-berocket_brand  .berocket_post_set_new_sortable .fa {
+.taxonomy-berocket_brand  .berocket_tax_set_new_sortable .fa {
     width: 20px;
+    text-align: center;
 }
-.taxonomy-berocket_brand .column-order .berocket_post_set_new_sortable_input {
+.taxonomy-berocket_brand .column-order .berocket_tax_set_new_sortable_input {
     display: inline-block;
     position: relative;
+    height: 30px;
 }
 
-.taxonomy-berocket_brand .column-order .berocket_post_set_new_sortable_input .br_brand_order_wait {
+.taxonomy-berocket_brand .striped > tbody .br-sortable-placeholder {
+    background: #fff;
+}
+
+.taxonomy-berocket_brand .striped > tbody .brand-sortable-placeholder {
+    height: 40px;
+    background-color: #d6d7d7;
+}
+
+.taxonomy-berocket_brand .column-order .berocket_tax_set_new_sortable_input .br_brand_order_wait {
     background: rgba(255, 255, 255, 0.5);
     bottom: 0;
     color: #777;
@@ -259,6 +270,23 @@
     right: 0;
     text-align: center;
     top: 0;
+}
+
+.taxonomy-berocket_brand .column-order .berocket_tax_set_new_sortable_input .fa {
+    position: absolute;
+    right: 0;
+    height: 100%;
+    vertical-align: middle;
+    display: inline-block;
+    font-size: 1em;
+    top: 0;
+    background-color: #2271b1;
+    border-radius: 0 4px 4px 0;
+    line-height: 30px;
+    height: 30px;
+    width: 20px;
+    color: white;
+    text-align: center;
 }
 
 .br_toggleswitch {
