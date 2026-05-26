@@ -238,11 +238,13 @@
 .taxonomy-berocket_brand .berocket_tax_set_new_sortable_input input {
     padding-right: 18px!important;
     width: 55px;
+    min-height: 30px;
 }
 
 .taxonomy-berocket_brand  .berocket_tax_set_new_sortable .fa {
     width: 20px;
     text-align: center;
+    font-weight: 900;
 }
 .taxonomy-berocket_brand .column-order .berocket_tax_set_new_sortable_input {
     display: inline-block;
@@ -287,6 +289,7 @@
     width: 20px;
     color: white;
     text-align: center;
+    font-weight: 900;
 }
 
 .br_toggleswitch {
@@ -437,4 +440,7 @@ input:checked + .br_toggleswitch_slider:before {
 .br_crosssign_stem2 {
   width: 9px;
   height: 2px;
+}
+.br_framework_settings .br_line_delimiter {
+    margin-right: 0 !important;
 }

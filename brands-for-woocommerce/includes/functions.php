@@ -203,6 +203,9 @@ function brfr_product_loop( $products, $atts ) {
         $BeRocket_product_brand = BeRocket_product_brand::getInstance();
         $options = $BeRocket_product_brand->get_option();
         $slider_data = $slider_data . ' data-slides_to_show="'.intval($columns).'"';
+        if( ! empty($atts['slides_to_scroll']) && intval($atts['slides_to_scroll']) ) {
+            $slider_data = $slider_data . ' data-slides_to_scroll="'.intval($atts['slides_to_scroll']).'"';
+        }
         echo '<style>' . brfr_add_slider_script( $options, ".$slider_class" ) . '</style>';
         echo '<script>if( typeof(brBrandSliderInit) != "undefined" ) brBrandSliderInit();</script>';
     }

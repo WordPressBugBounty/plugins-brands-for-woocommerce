@@ -5,7 +5,7 @@ if ( ! class_exists( 'BeRocket_alphabet_brand_widget' ) ) {
         public function __construct() {
             parent::__construct(
                 "berocket_alphabet_brand_widget",
-                __( "WooCommerce Brand Catalog", 'brands-for-woocommerce' ),
+                __( "BeRocket Brand Catalog", 'brands-for-woocommerce' ),
                 array( "description" => __( 'Brands grouped by name or category', 'brands-for-woocommerce' )  )
             );
 

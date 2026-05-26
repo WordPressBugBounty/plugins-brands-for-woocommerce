@@ -168,6 +168,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
             add_action( "wp_ajax_br_get_products", array ( $this, 'br_get_products' ) );
             add_action( "wp_ajax_br_brands_save_order", array ( $this, 'save_order' ) );
             add_action( "wp_ajax_br_brands_save_all_orders", array ( $this, 'save_all_orders' ) );
+            add_action( "wp_ajax_brbrand_divi5_preview", array ( $this, 'divi5_preview_ajax' ) );
 
             add_action( "wp_ajax_br_product_brand_settings_save", array ( $this, 'save_settings' ) );
             add_action( "woocommerce_archive_description", array ( $this, 'description' ), 5 );
@@ -199,6 +200,9 @@ class BeRocket_product_brand extends BeRocket_Framework {
             add_filter( 'wc_get_template', array($this, 'get_brands_template'), 10, 5 );
             add_filter( 'woocommerce_get_breadcrumb', array($this, 'remove_brand_crumb' ), 20, 2 );
             add_action( 'divi_extensions_init', array($this, 'divi_initialize_extension') );
+            add_action( 'et_builder_ready', array($this, 'divi_initialize_current_modules') );
+            add_action( 'divi_module_library_modules_dependency_tree', array($this, 'divi_initialize_divi5_modules') );
+            add_action( 'divi_visual_builder_assets_before_enqueue_scripts', array($this, 'divi_enqueue_divi5_assets') );
         }
         add_filter('parent_file', array($this, 'select_menu'));
         add_filter('submenu_file', array($this, 'select_submenu'));
@@ -1021,6 +1025,13 @@ class BeRocket_product_brand extends BeRocket_Framework {
                     "label" => __('Related products', 'brands-for-woocommerce'),
                     "tr_class" => "br_nowrap_label",
                     "items" => array(
+                        'related_products_display' => array(
+                            "type"  => "checkbox",
+                            "label_be_for" => __('Display', 'brands-for-woocommerce'),
+                            "name"  => "related_products_display",
+                            "value" => $this->defaults['related_products_display'],
+                            "class" => "br_brands_display_options",
+                        ),
                         'brand_products_out_of_stock' => array(
                             "type"  => "selectbox",
                             "label_be_for" => __('Out of stosck products', 'brands-for-woocommerce'),
@@ -1031,14 +1042,6 @@ class BeRocket_product_brand extends BeRocket_Framework {
                                 array( 'value' => 'date', 'text' => __( 'Show last', 'brands-for-woocommerce' ) ),
                                 array( 'value' => 'modified', 'text' => __( 'Show first', 'brands-for-woocommerce' ) ),
                             ),
-                            "class" => "br_brands_display_options",
-                        ),
-                        'related_products_display' => array(
-                            "type"  => "checkbox",
-                            "label_be_for" => __('Display', 'brands-for-woocommerce'),
-                            "name"  => "related_products_display",
-                            "value" => $this->defaults['related_products_display'],
-                            "class" => "br_brands_display_options",
                         ),
                         'related_products_columns' => array(
                             "type"         => "number",
@@ -1328,7 +1331,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
                 $options["{$new_key}_units"] = $units;
             }
         }
-        if ( version_compare( $previous, '3.8.1', '<' ) ) {
+        if ( ! empty($previous) && version_compare( $previous, '3.8.1', '<' ) ) {
             if( ! isset($options['addons']) || ! is_array($options['addons']) ) {
                 $options['addons'] = array();
             }
@@ -1555,6 +1558,84 @@ class BeRocket_product_brand extends BeRocket_Framework {
         if( class_exists('DiviExtension') ) {
             require_once plugin_dir_path( __FILE__ ) . 'divi/includes/BrandExtension.php';
         }
+    }
+    public function divi_initialize_current_modules() {
+        if( class_exists('ET_Builder_Module') ) {
+            require_once plugin_dir_path( __FILE__ ) . 'divi/includes/loader.php';
+        }
+    }
+    public function divi_initialize_divi5_modules( $dependency_tree ) {
+        if( class_exists('ET\Builder\Packages\ModuleLibrary\ModuleRegistration') ) {
+            require_once plugin_dir_path( __FILE__ ) . 'divi5/includes/loader.php';
+            brbrand_divi5_register_modules( $dependency_tree );
+        }
+    }
+    public function divi_enqueue_divi5_assets() {
+        if( ! function_exists('et_builder_d5_enabled') || ! et_builder_d5_enabled() ) {
+            return;
+        }
+
+        brfr_register_front_assets();
+        $options = $this->get_option();
+        wp_add_inline_style( 'berocket_slick', brfr_add_slider_script( $options, '.brcs_slider_brands' ) );
+        wp_enqueue_style( 'berocket_product_brand_style' );
+
+        $asset_path = plugin_dir_path( __FILE__ ) . 'divi5/visual-builder/build/brands-for-woocommerce-divi5.js';
+        if( ! file_exists( $asset_path ) || ! class_exists('ET\Builder\VisualBuilder\Assets\PackageBuildManager') ) {
+            return;
+        }
+
+        \ET\Builder\VisualBuilder\Assets\PackageBuildManager::register_package_build(
+            array(
+                'name'    => 'brands-for-woocommerce-divi5-visual-builder',
+                'version' => BeRocket_product_brand_version,
+                'script'  => array(
+                    'src'                => add_query_arg(
+                        array(
+                            'brbrand_ajax_url' => rawurlencode( admin_url( 'admin-ajax.php' ) ),
+                            'brbrand_action'   => 'brbrand_divi5_preview',
+                            'brbrand_nonce'    => wp_create_nonce( 'brbrand_divi5_preview' ),
+                        ),
+                        plugin_dir_url( __FILE__ ) . 'divi5/visual-builder/build/brands-for-woocommerce-divi5.js'
+                    ),
+                    'deps'               => array( 'divi-module-library', 'divi-vendor-wp-hooks', 'br_brands_slider' ),
+                    'enqueue_top_window' => false,
+                    'enqueue_app_window' => true,
+                ),
+            )
+        );
+    }
+    public function divi5_preview_ajax() {
+        if( ! check_ajax_referer( 'brbrand_divi5_preview', 'nonce', false ) ) {
+            wp_send_json_error( array( 'message' => __( 'Security check failed.', 'brands-for-woocommerce' ) ), 403 );
+        }
+
+        if( ! current_user_can( 'edit_posts' ) && ! current_user_can( 'edit_pages' ) && ! current_user_can( 'edit_theme_options' ) ) {
+            wp_send_json_error( array( 'message' => __( 'You do not have permission to preview this module.', 'brands-for-woocommerce' ) ), 403 );
+        }
+
+        $module_name = empty( $_POST['module'] ) ? '' : sanitize_text_field( wp_unslash( $_POST['module'] ) );
+        $attrs_json  = empty( $_POST['attrs'] ) ? '{}' : wp_unslash( $_POST['attrs'] );
+        $attrs       = json_decode( $attrs_json, true );
+
+        if( ! is_array( $attrs ) ) {
+            wp_send_json_error( array( 'message' => __( 'Invalid module attributes.', 'brands-for-woocommerce' ) ), 400 );
+        }
+
+        require_once plugin_dir_path( __FILE__ ) . 'divi5/includes/modules.php';
+        require_once plugin_dir_path( __FILE__ ) . 'divi5/includes/WidgetRenderer.php';
+
+        $module = brbrand_divi5_get_modules( $module_name );
+        if( empty( $module ) ) {
+            wp_send_json_error( array( 'message' => __( 'Unknown Divi module.', 'brands-for-woocommerce' ) ), 404 );
+        }
+
+        $renderer = new BrBrand_Divi5_Widget_Renderer( $module );
+        wp_send_json_success(
+            array(
+                'html' => $renderer->render_widget( $attrs ),
+            )
+        );
     }
 }
 

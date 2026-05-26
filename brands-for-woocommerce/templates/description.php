@@ -64,6 +64,9 @@ echo "<div class='brand_description_block'>";
 	        $paged = false;
 	        $per_page = -1;
 	    }
+	    if ( empty( $options['related_products_slider'] ) ) {
+
+		}
 
 		$products = wc_get_products(array(
 	        'status'   => 'publish',
@@ -80,6 +83,7 @@ echo "<div class='brand_description_block'>";
 			'columns'     => $options['related_products_columns'],
 			'cache_key'   => $get_argument,
 			'slider' 	  => $options['related_products_slider'],
+			'slides_to_scroll' => (empty($options['slides_to_scroll']) ? '' : $options['slides_to_scroll']),
 			'hide_brands' => $options['related_products_hide_brands'],
 			'paged' 	  => $paged,
 		) );

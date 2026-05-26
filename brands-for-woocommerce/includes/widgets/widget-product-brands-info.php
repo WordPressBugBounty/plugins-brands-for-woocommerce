@@ -3,7 +3,7 @@ class BeRocket_Product_Brands_Info_Widget extends BeRocket_Base_Brand_Descriptio
 	public function __construct() {
         parent::__construct( 
             "berocket_product_brands_info_widget", 
-            __( "WooCommerce Product Brand Info", 'brands-for-woocommerce' ),
+            __( "BeRocket Product Brand Info", 'brands-for-woocommerce' ),
             array( "description" => __( 'Brand info for single product', 'brands-for-woocommerce' ) ) 
         );
 
@@ -42,62 +42,72 @@ class BeRocket_Product_Brands_Info_Widget extends BeRocket_Base_Brand_Descriptio
             $instance = $this->defaults;
         }
 
-        if( empty( $instance['product'] ) ) {
-            global $wp_query;
-            if ( empty( $wp_query->queried_object->ID ) ) return;
-            $instance['product'] = $wp_query->queried_object->ID;
-        } 
+        $terms_filtered = array();
 
-        $products = explode(',', $instance['product']);
-        $products_id = array();
-        foreach($products as $product) {
-            if ( is_numeric( $product ) ) {
-                if( get_post_type(intval($product)) == 'product' ) {
-                    $products_id[] = $product;
-                }
-            } else {
-                $product_obj = get_page_by_title( sanitize_text_field($product), OBJECT, 'product' );
-                if( ! empty($product_obj) ) {
-                    $products_id[] = $product_obj->ID;
+        if( empty( $instance['product'] ) && is_tax( BeRocket_product_brand::$taxonomy_name ) ) {
+            $term = get_queried_object();
+            if( ! empty( $term->term_id ) && ! is_wp_error( $term ) && $term->taxonomy == BeRocket_product_brand::$taxonomy_name ) {
+                if( empty( $instance['featured'] ) || get_term_meta( $term->term_id, 'br_brand_featured', true ) ) {
+                    $terms_filtered[$term->term_id] = $term;
                 }
             }
-        }
-        if ( count( $products_id ) === 0 ) return;
-
-        $meta_args = empty( $instance['featured'] ) ? array() : 
-            array(
+        } else {
+            if( empty( $instance['product'] ) ) {
+                global $wp_query;
+                if ( empty( $wp_query->queried_object->ID ) ) return;
+                $instance['product'] = $wp_query->queried_object->ID;
+            }
+    
+            $products = explode(',', $instance['product']);
+            $products_id = array();
+            foreach($products as $product) {
+                if ( is_numeric( $product ) ) {
+                    if( get_post_type(intval($product)) == 'product' ) {
+                        $products_id[] = $product;
+                    }
+                } else {
+                    $product_obj = get_page_by_title( sanitize_text_field($product), OBJECT, 'product' );
+                    if( ! empty($product_obj) ) {
+                        $products_id[] = $product_obj->ID;
+                    }
+                }
+            }
+            if ( count( $products_id ) === 0 ) return;
+    
+            $meta_args = empty( $instance['featured'] ) ? array() : 
                 array(
-                   'key'   => 'br_brand_featured',
-                   'value' => 1,
-                )
+                    array(
+                       'key'   => 'br_brand_featured',
+                       'value' => 1,
+                    )
+                );
+    
+            $get_terms_args = array(
+                'hide_empty' => false,
+                'meta_query' => $meta_args,
+                'orderby'  => 'id',
+                'order'    => 'DESC',
             );
-
-        $get_terms_args = array(
-            'hide_empty' => false,
-            'meta_query' => $meta_args,
-            'orderby'  => 'id',
-            'order'    => 'DESC',
-        );
-        if ( !empty( $instance['limit'] ) ) {
-            $get_terms_args['number'] = intval($instance['limit']);
-        }
-        if( empty($get_terms_args['number']) ) {
-            $get_terms_args['number'] = 100;
-        }
-        $get_terms_args['number'] = intval($get_terms_args['number']);
-
-        $terms_filtered = array();
-        foreach($products_id as $product_id) {
-            $terms = wp_get_post_terms( $product_id, BeRocket_product_brand::$taxonomy_name, $get_terms_args );
-            if( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
-                foreach($terms as $term) {
-                    $terms_filtered[$term->term_id] = $term;
+            if ( !empty( $instance['limit'] ) ) {
+                $get_terms_args['number'] = intval($instance['limit']);
+            }
+            if( empty($get_terms_args['number']) ) {
+                $get_terms_args['number'] = 100;
+            }
+            $get_terms_args['number'] = intval($get_terms_args['number']);
+    
+            foreach($products_id as $product_id) {
+                $terms = wp_get_post_terms( $product_id, BeRocket_product_brand::$taxonomy_name, $get_terms_args );
+                if( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+                    foreach($terms as $term) {
+                        $terms_filtered[$term->term_id] = $term;
+                        if( count($terms_filtered) >= $get_terms_args['number'] ) {
+                            break;
+                        }
+                    }
                     if( count($terms_filtered) >= $get_terms_args['number'] ) {
                         break;
                     }
-                }
-                if( count($terms_filtered) >= $get_terms_args['number'] ) {
-                    break;
                 }
             }
         }

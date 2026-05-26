@@ -10,6 +10,9 @@ var brBrandSliderInit;
                 slidesToShow = 1;
             }
             let thisSlidesToScroll = slidesToScroll;
+            if( typeof($data['slides_to_scroll']) != 'undefined' ) {
+                thisSlidesToScroll = $data['slides_to_scroll'];
+            }
             if( thisSlidesToScroll > slidesToShow ) {
                 thisSlidesToScroll = slidesToShow;
             }

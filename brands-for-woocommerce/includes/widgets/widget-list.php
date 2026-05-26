@@ -4,7 +4,7 @@ if ( ! class_exists( 'BeRocket_product_brand_widget' ) ) {
 		public function __construct() {
 			parent::__construct(
 				"berocket_product_brand_widget",
-				__( "WooCommerce Brand List", 'brands-for-woocommerce' ),
+				__( "BeRocket Brand List", 'brands-for-woocommerce' ),
 				array( "description" =>  __( 'List of brands', 'brands-for-woocommerce' ) )
 			);
 
@@ -12,6 +12,7 @@ if ( ! class_exists( 'BeRocket_product_brand_widget' ) ) {
 				'per_row'       => 3,
 				'brands_number' => '',
 				'slider'        => 1,
+				'slides_to_scroll' => '',
 				'padding'       => 3,
 				'margin'        => 3,
 				'border_color'  => '#000000',
@@ -26,6 +27,13 @@ if ( ! class_exists( 'BeRocket_product_brand_widget' ) ) {
 					'slider' => array(
 						"title" => __( 'Slider', 'brands-for-woocommerce' ),
 						'type'  => 'checkbox',
+						'class' => 'br_brands_checkbox_block br_brand_hide_more_options',
+						'id'    => "slider_hide_depending",
+					),
+					'slides_to_scroll' => array(
+						"title" => __( 'Slider elements to scroll', 'brands-for-woocommerce' ),
+						'type'  => 'number',
+						'min'	=> '1',
 						'class' => 'br_brands_checkbox_block br_brand_hide_more_options',
 						'id'    => "slider_hide_depending",
 					)

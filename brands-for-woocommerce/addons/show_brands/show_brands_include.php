@@ -18,7 +18,7 @@ class BeRocket_brands_show_brands_class {
             'shop_name_display'          => 1,
             'shop_name_css'              => '',
             'product_display_brand'      => 1,
-            'product_display_position'   => 'after_image',
+            'product_display_position'   => 'taxonomies_list',
             'product_display_as_link'    => 1,
             'product_image_display'      => 1,
             'product_image_width'        => '64',
@@ -64,7 +64,7 @@ class BeRocket_brands_show_brands_class {
     public function update_version( $options, $previous ) {
         $default_options = array(
             'product_display_brand' => '1',
-            'product_display_position' => 'after_title',
+            'product_display_position' => 'taxonomies_list',
             'product_image_display' => '1',
             'product_image_width' => '35',
             'product_image_width_units' => '%',
@@ -121,8 +121,10 @@ class BeRocket_brands_show_brands_class {
                         array("value" => "after_image", "text" => __( 'After Image', 'brands-for-woocommerce' )),
                         array("value" => "in_title_before", "text" => __( 'In the title line, before the title', 'brands-for-woocommerce' )),
                         array("value" => "in_title_after", "text" => __( 'In the title line, after the title', 'brands-for-woocommerce' )),
+                        array("value" => "before_title", "text" => __( 'Before Title', 'brands-for-woocommerce' )),
                         array("value" => "after_title", "text" => __( 'After Title', 'brands-for-woocommerce' )),
                         array("value" => "after_price", "text" => __( 'After Price', 'brands-for-woocommerce' )),
+                        array("value" => "before_add_to_cart", "text" => __( 'Before Add to cart button', 'brands-for-woocommerce' )),
                         array("value" => "after_add_to_cart", "text" => __( 'After Add to cart button', 'brands-for-woocommerce' )),
                     ),
                     "value"    => $this->defaults['shop_display_position'],
@@ -184,10 +186,12 @@ class BeRocket_brands_show_brands_class {
                     "options"  => array(
                         array("value" => "before_all", "text" => __( 'Before all', 'brands-for-woocommerce' )),
                         array("value" => "after_image", "text" => __( 'After Image', 'brands-for-woocommerce' )),
+                        array("value" => "before_title", "text" => __( 'Before Title', 'brands-for-woocommerce' )),
                         array("value" => "after_title", "text" => __( 'After Title', 'brands-for-woocommerce' )),
                         array("value" => "in_title_before", "text" => __( 'In the title line, before the title', 'brands-for-woocommerce' )),
                         array("value" => "in_title_after", "text" => __( 'In the title line, after the title', 'brands-for-woocommerce' )),
                         array("value" => "after_price", "text" => __( 'After Price', 'brands-for-woocommerce' )),
+                        array("value" => "before_add_to_cart", "text" => __( 'Before Add to cart button', 'brands-for-woocommerce' )),
                         array("value" => "after_add_to_cart", "text" => __( 'After Add to cart button', 'brands-for-woocommerce' )),
                         array("value" => "brands_tab", "text" => __( 'On the "Brands" tab', 'brands-for-woocommerce' )),
                         array("value" => "taxonomies_list", "text" => __( 'After "Categories" and "Tags"', 'brands-for-woocommerce' )),
@@ -250,6 +254,10 @@ class BeRocket_brands_show_brands_class {
                 'woocommerce_before_shop_loop_item_title' => 20,
                 'lgv_advanced_after_img' => 38,
             ),
+            'before_title' => array(
+                'woocommerce_shop_loop_item_title' => 4,
+                'lgv_advanced_before_product_name' => 38,
+            ),
             'after_title' => array(
                 'woocommerce_shop_loop_item_title' => 38,
                 'lgv_advanced_before_description' => 38,
@@ -258,9 +266,13 @@ class BeRocket_brands_show_brands_class {
                 'woocommerce_after_shop_loop_item_title' => 38,
                 'lgv_advanced_after_price' => 38,
             ),
+            'before_add_to_cart' => array(
+                'woocommerce_after_shop_loop_item' => 7,
+                'lgv_advanced_before_add_to_cart' => 10,
+            ),
             'after_add_to_cart' => array(
                 'woocommerce_after_shop_loop_item' => 38,
-                'lgv_advanced_after_price' => 38,
+                'lgv_advanced_after_add_to_cart' => 10,
             ),
         );
         $product_display_brand = array(
@@ -270,11 +282,17 @@ class BeRocket_brands_show_brands_class {
             'after_image' => array(
                 'woocommerce_before_single_product_summary' => 30,
             ),
+            'before_title' => array(
+                'woocommerce_single_product_summary' => 3,
+            ),
             'after_title' => array(
                 'woocommerce_single_product_summary' => 7,
             ),
             'after_price' => array(
                 'woocommerce_single_product_summary' => 15,
+            ),
+            'before_add_to_cart' => array(
+                'woocommerce_single_product_summary' => 27,
             ),
             'after_add_to_cart' => array(
                 'woocommerce_single_product_summary' => 33,
@@ -329,7 +347,7 @@ class BeRocket_brands_show_brands_class {
 
     public function shop_brand_in_title_after() {
         $title = get_the_title();
-        $brands = $this->display_post_brands( 'shop' );
+        $brands = $this->display_post_brands( 'shop', array('shop_display_as_link' => 0) );
         echo "<h2 class='woocommerce-loop-product__title'>
             <span class='product-title'>$title</span>
             <span class='brands_in_title'>$brands</span>
@@ -338,7 +356,7 @@ class BeRocket_brands_show_brands_class {
 
     public function shop_brand_in_title_before() {
         $title = get_the_title();
-        $brands = $this->display_post_brands( 'shop' );
+        $brands = $this->display_post_brands( 'shop', array('shop_display_as_link' => 0) );
         echo "<h2 class='woocommerce-loop-product__title'>
             <span class='brands_in_title'>$brands</span>
             <span class='product-title'>$title</span>
@@ -355,8 +373,11 @@ class BeRocket_brands_show_brands_class {
         the_title( "<h1><span class='brands_in_title'>$brands</span><span class='product-title'>", '</span></h1>' );
     }
 
-    private function display_post_brands( $page_type ) {
+    private function display_post_brands( $page_type, $override_opt = array() ) {
         $options = $this->get_option();
+        if( is_array($override_opt) ) {
+            $options = array_merge($options, $override_opt);
+        }
         $post_id = get_the_ID();
         $terms = get_the_terms( $post_id, BeRocket_product_brand::$taxonomy_name );
         if( empty($terms) ) {

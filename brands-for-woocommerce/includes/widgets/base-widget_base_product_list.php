@@ -8,6 +8,7 @@ class BeRocket_Base_Product_List_Widget extends BeRocket_Brand_Base_Widget {
             'orderby'     => 'title',
             'order'       => 'asc',
             'slider'      => '',
+            'slides_to_scroll' => '',
             'hide_brands' => '',
             'per_page'    => '',
             'cache_key'   => '',
@@ -57,6 +58,12 @@ class BeRocket_Base_Product_List_Widget extends BeRocket_Brand_Base_Widget {
                 "title" => __( 'Hide brands', 'brands-for-woocommerce' ),
                 'type'  => 'checkbox',
                 'class' => 'br_brands_checkbox_block',
+            ),
+            'slides_to_scroll' => array(
+                "title" => __( 'Slider element to scroll', 'brands-for-woocommerce' ),
+                'type'  => 'number',
+                'class' => 'br_brands_orderby',
+                'min'   => 1,
             ),
         );
     }

@@ -12,6 +12,9 @@ if ( !empty( $atts['slider'] ) && $atts['slider'] == 1 ) {
     $BeRocket_product_brand = BeRocket_product_brand::getInstance();
     $options = $BeRocket_product_brand->get_option();
     $slider_data = $slider_data . ' data-slides_to_show="'.intval($per_row).'"';
+    if( ! empty($atts['slides_to_scroll']) && intval($atts['slides_to_scroll']) ) {
+        $slider_data = $slider_data . ' data-slides_to_scroll="'.intval($atts['slides_to_scroll']).'"';
+    }
     echo brfr_add_slider_script( $options, '.brcs_slider_brands' );
     $list_style = 'slider';
 } else {

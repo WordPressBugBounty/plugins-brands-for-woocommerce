@@ -231,6 +231,7 @@ class BeRocket_product_brand_shortcode {
                     </ul>
                 </li>
                 <li><i>slider</i> - (1 or 0) '.__("Related products Slider", 'brands-for-woocommerce').'</li>
+                <li><i>slides_to_scroll</i> - (integer) '.__("Related products to scroll at once", 'brands-for-woocommerce').'</li>
                 <li><i>hide_brands</i> - (1 or 0) '.__("Related products Hide Brands", 'brands-for-woocommerce').'</li>
                 <li><i>display_link</i> - (1 or 0) '.__("Display external link", 'brands-for-woocommerce').'</li>
                 <li><i>featured</i> - (1 or 0) '.__("Display last created featured brand", 'brands-for-woocommerce').'</li>
@@ -292,6 +293,7 @@ class BeRocket_product_brand_shortcode {
                 <li><i>out_of_stock</i> - (1 or 0) '.__("Hide brands with products out of stock", 'brands-for-woocommerce').'</li>
                 <li><i>featured_first</i> - (1 or 0) '.__("Featured first", 'brands-for-woocommerce').'</li>
                 <li><i>slider</i> - (1 or 0) '.__("Slider", 'brands-for-woocommerce').'</li>
+                <li><i>slides_to_scroll</i> - (integer) '.__("Elements to scroll at once", 'brands-for-woocommerce').'</li>
                 <li><i>category_only</i> - (1 or 0) '.__('Only brands of this category (on category page)', 'brands-for-woocommerce').'</li>
                 <li><i>hierarchy</i> - '.__("Show brands hierarchy", 'brands-for-woocommerce').'
                     <ul>
@@ -334,6 +336,7 @@ class BeRocket_product_brand_shortcode {
                     </ul>
                 </li>
                 <li><i>slider</i> - (1 or 0) '.__("Slider", 'brands-for-woocommerce').'</li>
+                <li><i>slides_to_scroll</i> - (integer) '.__("Products to scroll at once", 'brands-for-woocommerce').'</li>
                 <li><i>hide_brands</i> - (1 or 0) '.__("Hide brands", 'brands-for-woocommerce').'</li>
                 <li><i>hide_pagination</i> - (1 or 0) '.__("Hide pagination", 'brands-for-woocommerce').'</li>
                 <li><i>hide_labels</i> - (1 or 0) '.__("Hide BeRocket labels", 'brands-for-woocommerce').'</li>
@@ -408,6 +411,7 @@ class BeRocket_product_brand_shortcode {
                     </ul>
                 </li>
                 <li><i>slider</i> - (1 or 0) '.__("Related products Slider", 'brands-for-woocommerce').'</li>
+                <li><i>slides_to_scroll</i> - (integer) '.__("Related products to scroll at once", 'brands-for-woocommerce').'</li>
                 <li><i>hide_brands</i> - (1 or 0) '.__("Related products Hide Brands", 'brands-for-woocommerce').'</li>
                 <li><i>display_link</i> - (1 or 0) '.__("Display external link", 'brands-for-woocommerce').'</li>
                 <li><i>featured</i> - (1 or 0) '.__("Display last created featured brand", 'brands-for-woocommerce').'</li>
