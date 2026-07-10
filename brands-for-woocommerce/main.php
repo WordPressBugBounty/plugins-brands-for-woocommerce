@@ -360,7 +360,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
 
 				'rewrite' => array( 
                     'slug' => $category_base . ( empty($permalink_option) ? __( 'brands', 'brands-for-woocommerce' ) : $permalink_option ), 
-                    'with_front' => true, 
+                    'with_front' => false, 
                     'hierarchical' => true 
                 )
 			)
