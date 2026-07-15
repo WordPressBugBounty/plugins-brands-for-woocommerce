@@ -99,7 +99,8 @@ if ( ! class_exists( 'BeRocket_product_brand_widget' ) ) {
 				}
 			}
 			$query          = parent::form_query( $atts );
-			$query['limit'] = empty( $atts['brands_number'] ) ? '' : "LIMIT {$atts['brands_number']}";
+			$brands_number  = empty( $atts['brands_number'] ) ? 0 : min( 10000, absint( $atts['brands_number'] ) );
+			$query['limit'] = $brands_number ? $wpdb->prepare( 'LIMIT %d', $brands_number ) : '';
 
 			if ( ! empty( $atts['category_only'] ) ) {
 				$query = $this->form_query_add_category( $query, $atts );

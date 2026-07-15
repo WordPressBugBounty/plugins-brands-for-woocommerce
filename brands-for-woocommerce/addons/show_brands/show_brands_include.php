@@ -349,7 +349,7 @@ class BeRocket_brands_show_brands_class {
         $title = get_the_title();
         $brands = $this->display_post_brands( 'shop', array('shop_display_as_link' => 0) );
         echo "<h2 class='woocommerce-loop-product__title'>
-            <span class='product-title'>$title</span>
+            <span class='product-title'>" . esc_html( $title ) . "</span>
             <span class='brands_in_title'>$brands</span>
         </h2>";
     }
@@ -359,7 +359,7 @@ class BeRocket_brands_show_brands_class {
         $brands = $this->display_post_brands( 'shop', array('shop_display_as_link' => 0) );
         echo "<h2 class='woocommerce-loop-product__title'>
             <span class='brands_in_title'>$brands</span>
-            <span class='product-title'>$title</span>
+            <span class='product-title'>" . esc_html( $title ) . "</span>
         </h2>";
     }
 
@@ -374,6 +374,7 @@ class BeRocket_brands_show_brands_class {
     }
 
     private function display_post_brands( $page_type, $override_opt = array() ) {
+        $page_type = in_array( $page_type, array( 'shop', 'product' ), true ) ? $page_type : 'product';
         $options = $this->get_option();
         if( is_array($override_opt) ) {
             $options = array_merge($options, $override_opt);
@@ -391,12 +392,15 @@ class BeRocket_brands_show_brands_class {
 
             $align = '';
             $img_width = '';
-            if ( !empty( $options["{$page_type}_image_align"] ) ) {
-                if ( in_array( $options["{$page_type}_image_align"], array( 'under', 'above' ) ) ) {
+            $image_align = isset( $options["{$page_type}_image_align"] ) && in_array( $options["{$page_type}_image_align"], array( 'under', 'above', 'left', 'right', 'none' ), true )
+                ? $options["{$page_type}_image_align"]
+                : 'none';
+            if ( 'none' !== $image_align ) {
+                if ( in_array( $image_align, array( 'under', 'above' ), true ) ) {
                     $align = 'display: block !important;';
                     $img_width = 'width: 100%;';
-                } else if ( in_array( $options["{$page_type}_image_align"], array( 'left', 'right' ) ) ) {
-                    $align = "float:{$options["{$page_type}_image_align"]};";
+                } else if ( in_array( $image_align, array( 'left', 'right' ), true ) ) {
+                    $align = "float:$image_align;";
                     $img_width = 'width: 50%;';
                 }
             } 
@@ -404,21 +408,37 @@ class BeRocket_brands_show_brands_class {
             $image = '';
             $width = '';
             if ( !empty( $options["{$page_type}_image_display"] ) && !empty( $image_url ) ) {
-                $width  = empty( $options["{$page_type}_image_width"] ) ? '' : "width:{$options["{$page_type}_image_width"]}{$options["{$page_type}_image_width_units"]};";
-                $height = empty( $options["{$page_type}_image_height"] ) ? '' : "height:{$options["{$page_type}_image_height"]}{$options["{$page_type}_image_height_units"]};";
-                $fit    = empty( $options["{$page_type}_image_fit"] ) ? '' : "object-fit: {$options["{$page_type}_image_fit"]};";
+                $parsed_width = brfr_parse_css_size(
+                    isset( $options["{$page_type}_image_width"] ) ? $options["{$page_type}_image_width"] : '',
+                    isset( $options["{$page_type}_image_width_units"] ) ? $options["{$page_type}_image_width_units"] : 'px'
+                );
+                $parsed_height = brfr_parse_css_size(
+                    isset( $options["{$page_type}_image_height"] ) ? $options["{$page_type}_image_height"] : '',
+                    isset( $options["{$page_type}_image_height_units"] ) ? $options["{$page_type}_image_height_units"] : 'px'
+                );
+                $width = empty( $parsed_width['value'] ) ? '' : "width:{$parsed_width['value']}{$parsed_width['units']};";
+                $height = empty( $parsed_height['value'] ) ? '' : "height:{$parsed_height['value']}{$parsed_height['units']};";
+                $image_fit = isset( $options["{$page_type}_image_fit"] ) && in_array( $options["{$page_type}_image_fit"], array( 'cover', 'contain', 'fill', 'none' ), true )
+                    ? $options["{$page_type}_image_fit"]
+                    : 'cover';
+                $fit = "object-fit:$image_fit;";
                 $style  = empty( $options["{$page_type}_image_css"] ) ? '' : $options["{$page_type}_image_css"];
-                
-                $image .= "<img class='berocket_brand_post_image {$tooltip['class']}' src='$image_url' {$tooltip['data']} alt='{$term->name}' style='$img_width $height $fit $width $style' />";
+                $image_style = safecss_filter_attr( trim( "$img_width $height $fit $width $style" ) );
+                $tooltip_class = empty( $tooltip['class'] ) ? '' : $tooltip['class'];
+                $tooltip_attr = empty( $tooltip['text'] ) ? '' : ' data-tippy="' . esc_attr( $tooltip['text'] ) . '"';
+                $image .= '<img class="' . esc_attr( trim( 'berocket_brand_post_image ' . $tooltip_class ) ) . '" src="' . esc_url( $image_url ) . '"' . $tooltip_attr . ' alt="' . esc_attr( $term->name ) . '" style="' . esc_attr( $image_style ) . '" />';
             }
 
             $name = '';
             if( ! empty($options["{$page_type}_name_display"]) ) {
                 $style = empty( $options["{$page_type}_name_css"] ) ? $align : "$align {$options["{$page_type}_name_css"]}";
-                $name .= "<span class='berocket_brand_post_image_name {$tooltip['class']}' {$tooltip['data']} style='$style'>{$term->name}</span>";
+                $name_style = safecss_filter_attr( $style );
+                $tooltip_class = empty( $tooltip['class'] ) ? '' : $tooltip['class'];
+                $tooltip_attr = empty( $tooltip['text'] ) ? '' : ' data-tippy="' . esc_attr( $tooltip['text'] ) . '"';
+                $name .= '<span class="' . esc_attr( trim( 'berocket_brand_post_image_name ' . $tooltip_class ) ) . '"' . $tooltip_attr . ' style="' . esc_attr( $name_style ) . '">' . esc_html( $term->name ) . '</span>';
             }
 
-            if ( !empty( $options["{$page_type}_image_align"] ) && $options["{$page_type}_image_align"] == 'under' ) {
+            if ( 'under' === $image_align ) {
                 $brand_html = "$name $image";
             } else {
                 $brand_html = "$image $name";
@@ -433,10 +453,10 @@ class BeRocket_brands_show_brands_class {
                         'post_id'   => $post_id
                     ));
                 } else {
-                    $brand_html = "<a href='$term_link'>$brand_html</a>";
+                    $brand_html = '<a href="' . esc_url( $term_link ) . '">' . $brand_html . '</a>';
                 }
             }
-            $html .= "<div class='br_brand_{$page_type}_container' style='$width'>$brand_html</div>";
+            $html .= '<div class="' . esc_attr( "br_brand_{$page_type}_container" ) . '" style="' . esc_attr( safecss_filter_attr( $width ) ) . '">' . $brand_html . '</div>';
 
         }
         return $html;

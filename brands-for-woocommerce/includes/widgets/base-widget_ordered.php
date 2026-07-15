@@ -121,12 +121,13 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
     }
 
     public function widget($args, $instance) {
-        $instance = wp_parse_args( (array) $instance, $this->defaults );
+        $instance = (array) $instance;
         if ( empty( $args['template'] ) ) return;
         $instance = $this->replace_shortcode_keys( $instance );
 
-        $instance['title'] = apply_filters( 'widget_title', sanitize_text_field($instance['title']), $instance );
         $instance = shortcode_atts( $this->defaults, $instance );
+        $instance['title'] = apply_filters( 'widget_title', sanitize_text_field($instance['title']), $instance );
+        $instance = $this->sanitize_ordered_instance( $instance );
         
         $instance = $this->set_cache_key( $instance );
         $ordered_terms = $this->get_brands( $instance );
@@ -144,6 +145,80 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
 
         parent::widget( $args, $instance );
 	}
+
+    protected function sanitize_ordered_instance( $instance ) {
+        $instance = $this->get_size( 'img_width', $instance );
+        $instance = $this->get_size( 'img_height', $instance );
+
+        $instance['orderby'] = $this->sanitize_choice(
+            isset( $instance['orderby'] ) ? $instance['orderby'] : 'alphabet',
+            array( 'alphabet', 'name', 'products', 'count', 'order', 'random', 'slug', 'description' ),
+            'alphabet'
+        );
+        $instance['order'] = strtoupper( $this->sanitize_choice(
+            isset( $instance['order'] ) ? $instance['order'] : 'asc',
+            array( 'asc', 'desc' ),
+            'asc'
+        ) );
+        $instance['img_fit'] = $this->sanitize_choice(
+            isset( $instance['img_fit'] ) ? $instance['img_fit'] : 'cover',
+            array( 'cover', 'contain', 'fill', 'none' ),
+            'cover'
+        );
+        $instance['img_align'] = $this->sanitize_choice(
+            isset( $instance['img_align'] ) ? $instance['img_align'] : 'above',
+            array( 'above', 'left', 'right', 'under', 'none' ),
+            'above'
+        );
+        $instance['hierarchy'] = $this->sanitize_choice(
+            isset( $instance['hierarchy'] ) ? $instance['hierarchy'] : 'all',
+            array( 'top', 'children', 'expand', 'by_click', 'all', 'current_child' ),
+            'all'
+        );
+        $instance['include'] = $this->sanitize_id_list( isset( $instance['include'] ) ? $instance['include'] : '' );
+        $instance['exclude'] = $this->sanitize_id_list( isset( $instance['exclude'] ) ? $instance['exclude'] : '' );
+        $instance['brands_include'] = isset( $instance['brands_include'] ) && is_scalar( $instance['brands_include'] )
+            ? sanitize_text_field( $instance['brands_include'] )
+            : '';
+
+        foreach ( array(
+            'use_name', 'featured_first', 'count', 'img_display', 'hide_empty',
+            'out_of_stock', 'category_only', 'show_all', 'slider'
+        ) as $key ) {
+            if ( array_key_exists( $key, $instance ) ) {
+                $instance[$key] = brfr_sanitize_shortcode_bool( $instance[$key] );
+            }
+        }
+
+        if ( array_key_exists( 'style', $instance ) ) {
+            $instance['style'] = $this->sanitize_choice( $instance['style'], array( 'vertical', 'horizontal' ), 'vertical' );
+        }
+        if ( array_key_exists( 'groupby', $instance ) ) {
+            $instance['groupby'] = $this->sanitize_choice( $instance['groupby'], array( 'alphabet', 'category', 'none' ), 'alphabet' );
+        }
+        if ( array_key_exists( 'column', $instance ) ) {
+            $instance['column'] = max( 1, min( 100, absint( $instance['column'] ) ) );
+        }
+        if ( array_key_exists( 'per_row', $instance ) ) {
+            $instance['per_row'] = max( 1, min( 100, absint( $instance['per_row'] ) ) );
+        }
+        if ( array_key_exists( 'brands_number', $instance ) ) {
+            $instance['brands_number'] = empty( $instance['brands_number'] ) ? '' : min( 10000, absint( $instance['brands_number'] ) );
+        }
+        foreach ( array( 'padding', 'margin', 'border_width', 'slides_to_scroll' ) as $key ) {
+            if ( array_key_exists( $key, $instance ) ) {
+                $instance[$key] = empty( $instance[$key] ) ? '' : min( 10000, absint( $instance[$key] ) );
+            }
+        }
+        if ( array_key_exists( 'border_color', $instance ) ) {
+            $instance['border_color'] = sanitize_hex_color( $instance['border_color'] );
+            if ( empty( $instance['border_color'] ) ) {
+                $instance['border_color'] = '#000000';
+            }
+        }
+
+        return $instance;
+    }
 
 	public function update( $new_instance, $old_instance ) {
         $instance = parent::update( $new_instance, $old_instance );
@@ -337,7 +412,7 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
 
     protected function get_brands( $atts ) {
         $BeRocket_product_brand = BeRocket_product_brand::getInstance();
-        $cached_terms = $BeRocket_product_brand->get_from_cache( $atts['cache_key'] );
+        $cached_terms = $BeRocket_product_brand->get_from_cache( $atts['cache_storage_key'] );
         if( !empty( $cached_terms ) ) {
             // bd('from cache');
             //return $cached_terms;
@@ -391,7 +466,7 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
 
         $terms = $this->sort_terms( $terms, $atts );
 
-        $BeRocket_product_brand->set_to_cache( $atts['cache_key'], $terms );
+        $BeRocket_product_brand->set_to_cache( $atts['cache_storage_key'], $terms );
         return $terms;
     }
 
@@ -404,9 +479,6 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
             $instance['border_color'] = "#{$instance['border_color']}";
         }
 
-        $instance = $this->get_size( 'imgw', $instance );
-        $instance = $this->get_size( 'imgh', $instance );
-
         return $instance;
     }
 
@@ -415,7 +487,7 @@ class BeRocket_Brand_Base_Ordered_Widget extends BeRocket_Brand_Base_Widget {
         foreach ( $term->children as $id ) {
             $child_term = $all_terms[$id];
             $has_children = brfr_add_children_arrow( $child_term );
-            echo "<li class='{$has_children['class']}'><i class='fas fa-chevron-right br_brand_children_arrow_right'></i><span class='br_child_brand_name'><a href='{$child_term->link}'>{$child_term->name}</a><span class='br_brand_count'>({$child_term->count_posts})</span></span>{$has_children['arrow']}";
+            echo "<li class='" . esc_attr( $has_children['class'] ) . "'><i class='fas fa-chevron-right br_brand_children_arrow_right'></i><span class='br_child_brand_name'><a href='" . esc_url( $child_term->link ) . "'>" . esc_html( $child_term->name ) . "</a><span class='br_brand_count'>(" . absint( $child_term->count_posts ) . ")</span></span>{$has_children['arrow']}";
             if ( !empty( $child_term->children ) ) self::show_children( $all_terms, $child_term );
             echo '</li>';
         }

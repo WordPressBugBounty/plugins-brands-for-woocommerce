@@ -54,7 +54,14 @@ if ( ! class_exists( 'BeRocket_alphabet_brand_widget' ) ) {
         }
 
         private function br_get_brand_by_category( $term ) {
-            return empty( $term->category ) ? array( __( 'Uncategorized', 'brands-for-woocommerce' ) ) : unserialize( $term->category );
+            if ( empty( $term->category ) || ! is_string( $term->category ) ) {
+                return array( __( 'Uncategorized', 'brands-for-woocommerce' ) );
+            }
+            $categories = @unserialize( $term->category, array( 'allowed_classes' => false ) );
+            if ( ! is_array( $categories ) ) {
+                return array( __( 'Uncategorized', 'brands-for-woocommerce' ) );
+            }
+            return array_values( array_filter( array_map( 'sanitize_text_field', $categories ) ) );
         }
 
         private function br_get_brand_by_alphabet( $term ) {

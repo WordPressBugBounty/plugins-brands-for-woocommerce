@@ -89,22 +89,18 @@ class BeRocket_Base_Brand_Description_Widget extends BeRocket_Base_Product_List_
     }
 
     public function widget( $args, $instance ) {
-        $instance = $this->get_size( 'thumbnail_width', $instance );
-        $instance = $this->get_size( 'thumbnail_height', $instance );
-        $instance = $this->get_size( 'banner_width', $instance );
-        $instance = $this->get_size( 'banner_height', $instance );
-
         if ( is_tax( BeRocket_product_brand::$taxonomy_name ) || empty( $instance['terms'] ) ) {
             return;
         }
         
-        $instance['display_title'] = apply_filters( 'widget_title', empty($instance['display_title']) ? '' : sanitize_text_field($instance['display_title']), $instance );
         $instance = wp_parse_args( (array) $instance, $this->defaults );
+        $instance = $this->sanitize_description_instance( $instance );
+        $instance['display_title'] = apply_filters( 'widget_title', empty($instance['display_title']) ? '' : sanitize_text_field($instance['display_title']), $instance );
 
         $BeRocket_product_brand = BeRocket_product_brand::getInstance();
         $options = $BeRocket_product_brand->get_option();
         $instance['link_text'] = empty( $options['link_text'] ) ? '' : sanitize_text_field($options['link_text']);
-        $instance['link_open_in_new_tab'] = empty( $options['link_open_in_new_tab'] ) ? '' : $options['link_open_in_new_tab'];
+        $instance['link_open_in_new_tab'] = empty( $options['link_open_in_new_tab'] ) ? 0 : 1;
 
         $related_products_options = array(
             'columns',

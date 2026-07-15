@@ -1,4 +1,68 @@
 <?php
+/**
+ * Parse a CSS size used by public shortcodes/widgets.
+ *
+ * Only non-negative numbers and the units supported by the plugin are accepted.
+ * Returning the number and unit separately makes it possible to escape the final
+ * HTML attribute in its output context.
+ *
+ * @param mixed  $value         Size value, optionally including a unit.
+ * @param string $fallback_unit Unit to use when the value has no suffix.
+ * @return array{value:string,units:string}
+ */
+function brfr_parse_css_size( $value, $fallback_unit = 'px' ) {
+    $allowed_units = array( 'px', '%', 'em', 'rem' );
+    $fallback_unit = strtolower( (string) $fallback_unit );
+    if ( ! in_array( $fallback_unit, $allowed_units, true ) ) {
+        $fallback_unit = 'px';
+    }
+
+    if ( ! is_scalar( $value ) ) {
+        return array( 'value' => '', 'units' => $fallback_unit );
+    }
+
+    $value = trim( (string) $value );
+    if ( '' === $value ) {
+        return array( 'value' => '', 'units' => $fallback_unit );
+    }
+
+    if ( ! preg_match( '/^(?:\d+(?:\.\d+)?|\.\d+)\s*(px|%|em|rem)?$/i', $value, $matches ) ) {
+        return array( 'value' => '', 'units' => $fallback_unit );
+    }
+
+    $number = (float) $value;
+    if ( ! is_finite( $number ) ) {
+        return array( 'value' => '', 'units' => $fallback_unit );
+    }
+
+    // Keep generated CSS and queries within a sensible range.
+    $number = min( 100000, max( 0, $number ) );
+    $number = rtrim( rtrim( number_format( $number, 4, '.', '' ), '0' ), '.' );
+    if ( '' === $number ) {
+        $number = '0';
+    }
+
+    $unit = empty( $matches[1] ) ? $fallback_unit : strtolower( $matches[1] );
+
+    return array( 'value' => $number, 'units' => $unit );
+}
+
+/**
+ * Convert a public value to a strict shortcode boolean.
+ */
+function brfr_sanitize_shortcode_bool( $value ) {
+    if ( is_bool( $value ) ) {
+        return $value ? 1 : 0;
+    }
+
+    if ( is_scalar( $value ) ) {
+        $value = strtolower( trim( (string) $value ) );
+        return in_array( $value, array( '1', 'true', 'yes', 'on' ), true ) ? 1 : 0;
+    }
+
+    return 0;
+}
+
 function brfr_adjust_brightness($hexCode, $adjustPercent) {
     $hexCode = ltrim($hexCode, '#');
 
@@ -39,9 +103,8 @@ function brfr_image_options( $args ) {
                 "label_be_for" => __('Display', 'brands-for-woocommerce'),
                 "type"         => "checkbox",
                 "name"         => "{$image_name}_display",
-                "extra"        => " id='br_brand_{$image_name}_display'",
+                "extra"        => " id='br_brand_{$image_name}_display' {$args['extra']}",
                 "class"        => "{$args['class']} br_brands_display_options",
-                "extra"        => " {$args['extra']}",
                 "value"        => 1,
             ),
             "{$image_name}_width" => array(

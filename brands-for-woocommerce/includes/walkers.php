@@ -23,7 +23,7 @@ class Br_Walker_Category_Checklist extends Walker_Category_Checklist {
             }
 
             $output .= "\n" . '<li' . $class . '>' .
-                       '<div class="' . $inner_class . '" data-term-id=' . $category->term_id .
+                       '<div class="' . esc_attr( $inner_class ) . '" data-term-id="' . absint( $category->term_id ) . '"' .
                        ' tabindex="0" role="checkbox" aria-checked="' . $aria_checked . '">' .
                        /** This filter is documented in wp-includes/category-template.php */
                        esc_html( apply_filters( 'the_category', $category->name, '', '' ) ) . '</div>';
@@ -31,8 +31,8 @@ class Br_Walker_Category_Checklist extends Walker_Category_Checklist {
             $is_selected = in_array( $category->term_id, $args['selected_cats'], true );
             $is_disabled = ! empty( $args['disabled'] );
 
-            $output .= "\n<li id='{$taxonomy}-{$category->term_id}'$class>" .
-                       '<label class="selectit"><input value="' . $category->name . '" type="checkbox" name="' . $name . '[]" id="in-' . $taxonomy . '-' . $category->term_id . '"' .
+            $output .= "\n<li id='" . esc_attr( $taxonomy . '-' . absint( $category->term_id ) ) . "'$class>" .
+                       '<label class="selectit"><input value="' . esc_attr( $category->name ) . '" type="checkbox" name="' . esc_attr( $name ) . '[]" id="' . esc_attr( 'in-' . $taxonomy . '-' . absint( $category->term_id ) ) . '"' .
                        checked( $is_selected, true, false ) .
                        disabled( $is_disabled, true, false ) . ' /> ' .
                        /** This filter is documented in wp-includes/category-template.php */
@@ -63,7 +63,7 @@ class Br_Walker_Brand_Checklist extends Walker_Category_Checklist {
             }
 
             $output .= "\n" . '<li' . $class . '>' .
-                       '<div class="' . $inner_class . '" data-term-id=' . $category->term_id .
+                       '<div class="' . esc_attr( $inner_class ) . '" data-term-id="' . absint( $category->term_id ) . '"' .
                        ' tabindex="0" role="checkbox" aria-checked="' . $aria_checked . '">' .
                        /** This filter is documented in wp-includes/category-template.php */
                        esc_html( apply_filters( 'the_category', $category->name, '', '' ) ) . '</div>';
@@ -71,8 +71,8 @@ class Br_Walker_Brand_Checklist extends Walker_Category_Checklist {
             $is_selected = in_array( $category->term_id, $args['selected_cats'], true );
             $is_disabled = ! empty( $args['disabled'] );
 
-            $output .= "\n<li id='{$taxonomy}-{$category->term_id}'$class>
-                       <label class='selectit'><input value='{$category->term_id}' type='checkbox' name='{$name}[]'" .
+            $output .= "\n<li id='" . esc_attr( $taxonomy . '-' . absint( $category->term_id ) ) . "'$class>
+                       <label class='selectit'><input value='" . absint( $category->term_id ) . "' type='checkbox' name='" . esc_attr( $name ) . "[]'" .
                        checked( $is_selected, true, false ) .
                        disabled( $is_disabled, true, false ) . ' /> ' .
                        /** This filter is documented in wp-includes/category-template.php */
@@ -109,7 +109,7 @@ class Br_Walker_Brand_Selectlist extends Walker_Category_Checklist {
             }
 
             $output .= "\n" . '<li' . $class . '>' .
-                       '<div class="' . $inner_class . '" data-term-id=' . $category->term_id .
+                       '<div class="' . esc_attr( $inner_class ) . '" data-term-id="' . absint( $category->term_id ) . '"' .
                        ' tabindex="0" role="checkbox" aria-checked="' . $aria_checked . '">' .
                        /** This filter is documented in wp-includes/category-template.php */
                        esc_html( apply_filters( 'the_category', $category->name, '', '' ) ) . '</div>';
@@ -117,8 +117,8 @@ class Br_Walker_Brand_Selectlist extends Walker_Category_Checklist {
             $is_selected = in_array( $category->term_id, $args['selected_cats'], true );
             $is_disabled = ! empty( $args['disabled'] );
 
-            $output .= "\n<li id='{$taxonomy}-{$category->term_id}'$class>
-                       <label class='selectit'><input value='{$category->term_id}' type='radio' name='{$name}[]'" .
+            $output .= "\n<li id='" . esc_attr( $taxonomy . '-' . absint( $category->term_id ) ) . "'$class>
+                       <label class='selectit'><input value='" . absint( $category->term_id ) . "' type='radio' name='" . esc_attr( $name ) . "[]'" .
                        checked( $is_selected, true, false ) .
                        disabled( $is_disabled, true, false ) . ' /> ' .
                        /** This filter is documented in wp-includes/category-template.php */

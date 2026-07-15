@@ -106,6 +106,12 @@ class brbrand_deprecated_shortcodes_divi_addon {
             'image'     => '1',
 			'url'       => '',
 		), $atts );
+        $atts['post_id'] = empty( $atts['post_id'] ) ? 0 : absint( $atts['post_id'] );
+        $width = brfr_parse_css_size( $atts['width'], '%' );
+        $height = brfr_parse_css_size( $atts['height'], 'px' );
+        $atts['position'] = in_array( $atts['position'], array( 'left', 'right', 'none' ), true ) ? $atts['position'] : 'none';
+        $atts['image'] = brfr_sanitize_shortcode_bool( $atts['image'] );
+        $atts['url'] = brfr_sanitize_shortcode_bool( $atts['url'] );
         if( empty($atts['post_id']) ) {
             $atts['post_id'] = get_the_ID();
             if( empty($atts['post_id']) ) {
@@ -120,20 +126,25 @@ class brbrand_deprecated_shortcodes_divi_addon {
             foreach($terms as $term) {
                 $image 	= get_term_meta( $term->term_id, 'brand_image_url', true );
                 if( ! empty($atts['url']) ) {
-                    echo '<a href="' . get_term_link( (int)$term->term_id ) . '">';
+                    $term_link = get_term_link( (int) $term->term_id, self::$taxonomy_name );
+                    if ( ! is_wp_error( $term_link ) ) {
+                        echo '<a href="' . esc_url( $term_link ) . '">';
+                    } else {
+                        $atts['url'] = 0;
+                    }
                 }
                 if( ! empty($image) && ! empty($atts['image']) ) {
-                    echo '<img class="berocket_brand_post_image" src="', $image, '" alt="', $term->name, '" style="',
-                    (empty($atts['width']) ? '' : 'width:'.$atts['width'].';'),
-                    (empty($atts['height']) ? '' : 'height:'.$atts['height'].';'),
-                    (empty($atts['position']) ? '' : 'float:'.$atts['position'].';'),
-                    '">';
+                    $style = '';
+                    if ( '' !== $width['value'] ) $style .= "width:{$width['value']}{$width['units']};";
+                    if ( '' !== $height['value'] ) $style .= "height:{$height['value']}{$height['units']};";
+                    if ( in_array( $atts['position'], array( 'left', 'right' ), true ) ) $style .= "float:{$atts['position']};";
+                    echo '<img class="berocket_brand_post_image" src="' . esc_url( $image ) . '" alt="' . esc_attr( $term->name ) . '" style="' . esc_attr( safecss_filter_attr( $style ) ) . '">';
                 } else {
-                    echo '<span class="berocket_brand_post_image_name" style="display: block;', 
-                    (empty($atts['width']) ? '' : 'width:'.$atts['width'].';'),
-                    (empty($atts['height']) ? '' : 'height:'.$atts['height'].';'),
-                    (empty($atts['position']) ? '' : 'float:'.$atts['position'].';'),
-                    '">', @ $term->name, '</span>';
+                    $style = 'display:block;';
+                    if ( '' !== $width['value'] ) $style .= "width:{$width['value']}{$width['units']};";
+                    if ( '' !== $height['value'] ) $style .= "height:{$height['value']}{$height['units']};";
+                    if ( in_array( $atts['position'], array( 'left', 'right' ), true ) ) $style .= "float:{$atts['position']};";
+                    echo '<span class="berocket_brand_post_image_name" style="' . esc_attr( safecss_filter_attr( $style ) ) . '">' . esc_html( $term->name ) . '</span>';
                 }
                 if( ! empty($atts['url']) ) {
                     echo '</a>';

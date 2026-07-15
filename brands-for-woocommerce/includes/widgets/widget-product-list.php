@@ -41,7 +41,8 @@ class BeRocket_product_list_Widget extends BeRocket_Base_Product_List_Widget {
     }
 
     public function widget( $args, $instance ) {
-        $instance = array_merge( $this->defaults, $instance );
+        $instance = array_merge( $this->defaults, (array) $instance );
+        $instance = $this->sanitize_product_list_instance( $instance );
 
         $BeRocket_product_brand = BeRocket_product_brand::getInstance();
         //$products = $BeRocket_product_brand->get_from_cache( $instance['cache_key'] );
@@ -65,6 +66,7 @@ class BeRocket_product_list_Widget extends BeRocket_Base_Product_List_Widget {
             $ordering_args = WC()->query->get_catalog_ordering_args( $instance['orderby'], $instance['order'] );
             $meta_query    = WC()->query->get_meta_query();
             $field         = empty( $instance['brand_field'] ) ? $this->defaults['brand_field'] : $instance['brand_field'];
+            $field         = in_array( $field, array( 'term_id', 'id', 'slug', 'name' ), true ) ? $field : $this->defaults['brand_field'];
             $brands        = empty( $brands ) ? array() : ( is_array( $brands ) ? $brands : explode( ',', $brands ) );
             $brands        = array_map( 'trim', $brands );
 
@@ -131,7 +133,7 @@ class BeRocket_product_list_Widget extends BeRocket_Base_Product_List_Widget {
         }
         ob_start();
         echo $args['before_widget'];
-        if ( !empty( $instance['title'] ) ) echo $args['before_title'], $instance['title'], $args['after_title'];
+        if ( !empty( $instance['title'] ) ) echo $args['before_title'], wp_kses_post( $instance['title'] ), $args['after_title'];
         brfr_product_loop( $products, $instance );
         echo $args['after_widget'];
         $return = ob_get_clean();

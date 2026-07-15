@@ -20,9 +20,15 @@ class BeRocket_Brand_Base_Widget extends WP_Widget {
     }
 
     protected function set_cache_key( $instance ) {
-        if ( !empty( $instance['cache_key'] ) ) return $instance;
-        
-        $instance['cache_key'] = $this->id . brfr_language_prefix();
+        $cache_key = empty( $instance['cache_key'] ) ? $this->id . brfr_language_prefix() : $instance['cache_key'];
+        $cache_key = sanitize_key( (string) $cache_key );
+        if ( empty( $cache_key ) ) {
+            $cache_key = sanitize_key( $this->id );
+        }
+        $instance['cache_key'] = substr( $cache_key, 0, 120 );
+        // The public key is part of DOM classes and pagination URLs, so preserve
+        // its historical contract. Use a non-user-controllable key for storage.
+        $instance['cache_storage_key'] = 'br_brands_widget_' . hash( 'sha256', $instance['cache_key'] );
         return $instance;
     }
 
@@ -36,21 +42,93 @@ class BeRocket_Brand_Base_Widget extends WP_Widget {
     }
 
     protected function get_size( $side, $atts ) {
-        if ( empty( $atts[$side] ) ) return $atts;
-        $size = $atts[$side];
-
-        if ( is_numeric( $size ) ) {
-            if( ! empty( $atts["{$side}_units"] ) && $atts["{$side}_units"] == '%' ) {
-                $atts["{$side}_units"] = '%';
-            } else {
-                $atts["{$side}_units"] = 'px';
-            }
-        } else {
-            $size_numeric = intval( $size );
-            $atts["{$side}_units"] = str_replace( $size_numeric, '', $size );
-            $atts[$side] = $size_numeric;
-       }
+        $fallback_unit = empty( $atts["{$side}_units"] ) ? 'px' : $atts["{$side}_units"];
+        $parsed = brfr_parse_css_size( isset( $atts[$side] ) ? $atts[$side] : '', $fallback_unit );
+        $atts[$side] = $parsed['value'];
+        $atts["{$side}_units"] = $parsed['units'];
         return $atts;
+    }
+
+    protected function sanitize_choice( $value, $allowed, $default ) {
+        $value = is_scalar( $value ) ? strtolower( trim( (string) $value ) ) : '';
+        return in_array( $value, $allowed, true ) ? $value : $default;
+    }
+
+    protected function sanitize_id_list( $value ) {
+        if ( ! is_array( $value ) ) {
+            $value = explode( ',', (string) $value );
+        }
+        $value = array_values( array_unique( array_filter( array_map( 'absint', $value ) ) ) );
+        return implode( ',', $value );
+    }
+
+    protected function sanitize_product_list_instance( $instance ) {
+        $instance['columns'] = max( 1, min( 12, absint( isset( $instance['columns'] ) ? $instance['columns'] : 4 ) ) );
+        if ( empty( $instance['per_page'] ) ) {
+            $instance['per_page'] = '';
+        } elseif ( -1 === intval( $instance['per_page'] ) ) {
+            $instance['per_page'] = -1;
+        } else {
+            $instance['per_page'] = min( 1000, absint( $instance['per_page'] ) );
+        }
+        $instance['slides_to_scroll'] = empty( $instance['slides_to_scroll'] ) ? '' : max( 1, min( 1000, absint( $instance['slides_to_scroll'] ) ) );
+        $instance['orderby'] = $this->sanitize_choice(
+            isset( $instance['orderby'] ) ? $instance['orderby'] : 'title',
+            array( 'title', 'name', 'date', 'modified', 'rand' ),
+            'title'
+        );
+        $instance['order'] = $this->sanitize_choice(
+            isset( $instance['order'] ) ? $instance['order'] : 'asc',
+            array( 'asc', 'desc' ),
+            'asc'
+        );
+        foreach ( array( 'slider', 'hide_brands', 'hide_pagination', 'hide_labels' ) as $key ) {
+            if ( array_key_exists( $key, $instance ) ) {
+                $instance[$key] = brfr_sanitize_shortcode_bool( $instance[$key] );
+            }
+        }
+
+        $instance = $this->set_cache_key( $instance );
+        return $instance;
+    }
+
+    protected function sanitize_description_instance( $instance ) {
+        foreach ( array( 'thumbnail_width', 'thumbnail_height', 'banner_width', 'banner_height' ) as $size ) {
+            $instance = $this->get_size( $size, $instance );
+        }
+
+        $instance['thumbnail_fit'] = $this->sanitize_choice(
+            isset( $instance['thumbnail_fit'] ) ? $instance['thumbnail_fit'] : 'cover',
+            array( 'cover', 'contain', 'fill', 'none' ),
+            'cover'
+        );
+        $instance['banner_fit'] = $this->sanitize_choice(
+            isset( $instance['banner_fit'] ) ? $instance['banner_fit'] : 'cover',
+            array( 'cover', 'contain', 'fill', 'none' ),
+            'cover'
+        );
+        $instance['thumbnail_align'] = $this->sanitize_choice(
+            isset( $instance['thumbnail_align'] ) ? $instance['thumbnail_align'] : 'none',
+            array( 'left', 'right', 'none' ),
+            'none'
+        );
+        $instance['banner_align'] = $this->sanitize_choice(
+            isset( $instance['banner_align'] ) ? $instance['banner_align'] : 'center',
+            array( 'left', 'right', 'center', 'none' ),
+            'center'
+        );
+
+        foreach ( array(
+            'display_title', 'display_categories', 'display_description', 'banner_display',
+            'thumbnail_display', 'related_products_display', 'display_link', 'featured',
+            'link_open_in_new_tab'
+        ) as $key ) {
+            if ( array_key_exists( $key, $instance ) ) {
+                $instance[$key] = brfr_sanitize_shortcode_bool( $instance[$key] );
+            }
+        }
+
+        return $this->sanitize_product_list_instance( $instance );
     }
 
     // $args = array( 'attributes' => [ options for <select> as array( 'value' => 'title' ); or placeholder, min/max for <input> ] 
@@ -199,9 +277,15 @@ class BeRocket_Brand_Base_Widget extends WP_Widget {
         $class      = empty( $args['class'] ) ? '' : $args['class'];
         $id         = empty( $args['id'] ) ? '' : "id='{$args['id']}'";
 
-        $brands = empty( $instance[$name] ) ? array() : array_map( function($v) { 
-            $term = get_term_by( 'term_id', $v, BeRocket_product_brand::$taxonomy_name ); return $term->term_id; }, 
-                unserialize( $instance[$name] ) );
+        $stored_brands = empty( $instance[$name] ) || ! is_string( $instance[$name] )
+            ? array()
+            : @unserialize( $instance[$name], array( 'allowed_classes' => false ) );
+        $stored_brands = is_array( $stored_brands ) ? array_map( 'absint', $stored_brands ) : array();
+        $brands = array_map( function($v) {
+            $term = get_term_by( 'term_id', $v, BeRocket_product_brand::$taxonomy_name );
+            return $term instanceof WP_Term ? $term->term_id : 0;
+        }, $stored_brands );
+        $brands = array_filter( $brands );
 
         return "<p class='br_brand_product_categories_container $class' $id>$title
             <ul class='br_brand_product_categories $class'>"
@@ -285,7 +369,7 @@ class BeRocket_Brand_Base_Widget extends WP_Widget {
         $content = ob_get_clean();
         if( $content ) {
             echo $args['before_widget'];
-            if ( !empty( $instance['title'] ) ) echo $args['before_title'], sanitize_text_field($instance['title']), $args['after_title'];
+            if ( !empty( $instance['title'] ) ) echo $args['before_title'], wp_kses_post( $instance['title'] ), $args['after_title'];
             echo $content;
             echo $args['after_widget'];
         }

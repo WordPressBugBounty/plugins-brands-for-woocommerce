@@ -642,10 +642,13 @@ class BeRocket_product_brand extends BeRocket_Framework {
     }
 
     public function save_permalink_option() {
-        if ( isset( $_POST['berocket_brands_permalink'] ) ) {
-            $option_values = $_POST['berocket_brands_permalink'];
-            update_option( 'berocket_brands_permalink', $option_values );
-        }
+        if ( ! isset( $_POST['berocket_brands_permalink'] ) ) return;
+        if ( ! current_user_can( 'manage_options' ) ) return;
+        if ( empty( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== strtoupper( $_SERVER['REQUEST_METHOD'] ) ) return;
+
+        check_admin_referer( 'update-permalink' );
+        $option_values = sanitize_title_with_dashes( wp_unslash( $_POST['berocket_brands_permalink'] ) );
+        update_option( 'berocket_brands_permalink', $option_values );
     }
 
     private function get_fields( $term_id = false ) {
@@ -656,32 +659,37 @@ class BeRocket_product_brand extends BeRocket_Framework {
             $value = $term_id ? get_term_meta( $term_id, $name, true ) : 
                 ( isset( $attribute['default'] ) ? $attribute['default'] : '' );
             $type = $attribute['type'];
+            $name_attr = esc_attr( $name );
+            $type_attr = esc_attr( $type );
+            $label = esc_html( $attribute['label'] );
+            $value_attr = is_scalar( $value ) ? esc_attr( $value ) : '';
 
             $fields .= ( $pagenow == 'edit-tags.php' ) ?
-                    "<div class='form-field term-$name-wrap'>
-                        <label class='br_brand_$type' for='$name'>{$attribute['label']}</label>"
-                    : "<tr class='form-field term-$name-wrap'>
-                        <th scope='row'><label class='br_brand_$type' for='$name'>{$attribute['label']}</label></th>
+                    "<div class='form-field term-{$name_attr}-wrap'>
+                        <label class='br_brand_{$type_attr}' for='{$name_attr}'>{$label}</label>"
+                    : "<tr class='form-field term-{$name_attr}-wrap'>
+                        <th scope='row'><label class='br_brand_{$type_attr}' for='{$name_attr}'>{$label}</label></th>
                         <td>";
 
             switch ( $type ) {
                 case 'image':
+                    $image_value = is_scalar( $value ) ? esc_url_raw( $value ) : '';
                     $select_upload = $value ? 
-                        berocket_font_select_upload( '', 'br_brand_options_ajax_load_icon', $attribute['image_name'], @ $value, false) 
+                        berocket_font_select_upload( '', 'br_brand_options_ajax_load_icon', $attribute['image_name'], $image_value, false)
                         : berocket_font_select_upload( '', 'br_brand_options_ajax_load_icon', $attribute['image_name'], '', false);
                     $fields .=  
-                        "<div id='$name' class='br_brands_image'>$select_upload</div>";
+                        "<div id='{$name_attr}' class='br_brands_image'>$select_upload</div>";
                     break;
                  
                 case 'color':
                     $fields .=  
-                        "<input type='text' id='$name' name='$name' value='$value' class='br_brand_colorpicker' />";
+                        "<input type='text' id='{$name_attr}' name='{$name_attr}' value='{$value_attr}' class='br_brand_colorpicker' />";
                     break;
                  
                 case 'checkbox':
                     $is_checked = empty( $value ) ? '' : 'checked="checked"';
                     $fields .=  
-                        "<input type='checkbox' id='$name' name='$name' value='1' $is_checked />";
+                        "<input type='checkbox' id='{$name_attr}' name='{$name_attr}' value='1' $is_checked />";
                     break;
                  
                 case 'products_selector':
@@ -699,7 +707,10 @@ class BeRocket_product_brand extends BeRocket_Framework {
                     break;
 
                 case 'category_checklist':
-                    $cat_ids = empty($value) ? array() : array_map( function($v) { $term = get_term_by( 'name', $v, 'product_cat' ); return $term->term_id; }, $value );
+                    $cat_ids = empty( $value ) || ! is_array( $value ) ? array() : array_filter( array_map( function( $v ) {
+                        $term = get_term_by( 'name', $v, 'product_cat' );
+                        return $term instanceof WP_Term ? $term->term_id : 0;
+                    }, $value ) );
 
                     $fields .=  '<ul class="br_brand_product_categories">' 
                         . wp_terms_checklist( 0, array( 
@@ -713,13 +724,13 @@ class BeRocket_product_brand extends BeRocket_Framework {
 
                 default:
                     $args = empty( $attribute['attributes'] ) ? '' 
-                        : implode( ' ', array_map( function( $key, $value ) { return "$key='$value'";}, 
+                        : implode( ' ', array_map( function( $key, $value ) { return esc_attr( $key ) . "='" . esc_attr( $value ) . "'";},
                             array_keys( $attribute['attributes'] ), $attribute['attributes'] ) );
-                    $fields .= "<input name='$name' id='$name' type='{$attribute['type']}' value='$value' $args />";
+                    $fields .= "<input name='{$name_attr}' id='{$name_attr}' type='{$type_attr}' value='{$value_attr}' $args />";
                     break;
              }
             if ( !empty( $attribute['description'] ) ) {
-                $fields .= "<p>{$attribute['description']}</p>";
+                $fields .= '<p>' . esc_html( $attribute['description'] ) . '</p>';
             }
             $fields .= ( $pagenow == 'edit-tags.php' ) ? '</div>' : '</td></tr>' ; 
         }
@@ -742,36 +753,49 @@ class BeRocket_product_brand extends BeRocket_Framework {
                 case 'image':
                     $image_name = $attribute['image_name'];
                     if ( isset( $_POST[$image_name] ) ) {
-                        update_term_meta( $term_id, $name, $_POST[$image_name] );
+                        $image_url = is_scalar( $_POST[$image_name] ) ? esc_url_raw( wp_unslash( $_POST[$image_name] ) ) : '';
+                        update_term_meta( $term_id, $name, $image_url );
                     }
                     break;
              
                 case 'checkbox':
-                    if ( !empty( $_POST[$name] ) ) {
-                        update_term_meta( $term_id, $name, $_POST[$name] );
-                    } else {
-                        update_term_meta( $term_id, $name, false );
-                    }
+                    update_term_meta( $term_id, $name, empty( $_POST[$name] ) ? 0 : 1 );
                     break;
 
                 case 'category_checklist':
-                    if ( !empty( $_POST[$name] ) && !empty( $_POST[$name]['product_cat'] ) ) {
-                        update_term_meta( $term_id, $name, $_POST[$name]['product_cat'] );
-                    } else {
-                        update_term_meta( $term_id, $name, array() );
+                    $categories = array();
+                    $posted_categories = isset( $_POST[$name]['product_cat'] ) && is_array( $_POST[$name]['product_cat'] )
+                        ? wp_unslash( $_POST[$name]['product_cat'] )
+                        : array();
+                    foreach ( $posted_categories as $category_name ) {
+                        $category_name = sanitize_text_field( $category_name );
+                        $category = get_term_by( 'name', $category_name, 'product_cat' );
+                        if ( $category instanceof WP_Term ) {
+                            $categories[] = $category->name;
+                        }
                     }
+                    update_term_meta( $term_id, $name, wp_slash( array_values( array_unique( $categories ) ) ) );
                     break;
 
                 case 'products_selector':
-                    if ( isset( $_POST[$name] ) ) {
-                        update_term_meta( $term_id, $name, $_POST[$name] );
-                    } else {
-                        update_term_meta( $term_id, $name, false );
-                    }
+                    $products = isset( $_POST[$name] ) ? (array) wp_unslash( $_POST[$name] ) : array();
+                    $products = array_values( array_unique( array_filter( array_map( 'absint', $products ) ) ) );
+                    update_term_meta( $term_id, $name, $products );
+                    break;
 
                 default:
                     if ( isset( $_POST[$name] ) ) {
-                        update_term_meta( $term_id, $name, $_POST[$name] );
+                        $posted_value = is_scalar( $_POST[$name] ) ? wp_unslash( $_POST[$name] ) : '';
+                        if ( 'url' === $attribute['type'] ) {
+                            $posted_value = esc_url_raw( $posted_value );
+                        } elseif ( 'hidden' === $attribute['type'] ) {
+                            $posted_value = absint( $posted_value );
+                        } elseif ( 'color' === $attribute['type'] ) {
+                            $posted_value = sanitize_hex_color( $posted_value );
+                        } else {
+                            $posted_value = sanitize_text_field( $posted_value );
+                        }
+                        update_term_meta( $term_id, $name, wp_slash( $posted_value ) );
                     }
                     break;
             }
@@ -1388,9 +1412,31 @@ class BeRocket_product_brand extends BeRocket_Framework {
     }
 
     public static function get_tooltip_data( $tooltip ) {
-        if( is_array( $tooltip ) ) return $tooltip;
-        return empty( $tooltip ) ? array( 'class' => '', 'data' => '' ) 
-            : array( 'class' => 'br_brand_tippy', 'data' => "data-tippy='$tooltip'" );
+        $class = '';
+        if ( is_array( $tooltip ) ) {
+            if ( ! empty( $tooltip['class'] ) && is_scalar( $tooltip['class'] ) ) {
+                $classes = preg_split( '/\s+/', trim( (string) $tooltip['class'] ) );
+                $classes = array_filter( array_map( 'sanitize_html_class', $classes ) );
+                $class = implode( ' ', $classes );
+            }
+            $tooltip = isset( $tooltip['text'] ) ? $tooltip['text'] : ( isset( $tooltip['data'] ) ? $tooltip['data'] : '' );
+            $tooltip = preg_replace( '/^data-tippy\s*=\s*([\'\"])(.*)\1$/s', '$2', (string) $tooltip );
+        }
+        $tooltip = is_scalar( $tooltip ) ? sanitize_text_field( (string) $tooltip ) : '';
+        if ( empty( $tooltip ) ) {
+            return array( 'class' => '', 'text' => '', 'data' => '' );
+        }
+        if ( empty( $class ) ) {
+            $class = 'br_brand_tippy';
+        }
+
+        // Keep the legacy `data` fragment safe for template overrides while new
+        // templates consume the plain `text` value in their own attribute context.
+        return array(
+            'class' => $class,
+            'text'  => $tooltip,
+            'data'  => "data-tippy='" . esc_attr( $tooltip ) . "'",
+        );
     }
 
     public function get_from_cache( $key ) {
@@ -1417,29 +1463,37 @@ class BeRocket_product_brand extends BeRocket_Framework {
     }
 
     public function save_order() {
-        $nonce = (empty($_REQUEST['nonce']) ? '' : $_REQUEST['nonce']);
-        if( ! wp_verify_nonce($nonce, 'br_brands_save_order') ) {
-            wp_die();
+        check_ajax_referer( 'br_brands_save_order', 'nonce' );
+        if ( ! current_user_can( 'manage_product_terms' ) ) {
+            wp_send_json_error( array( 'message' => __( 'You are not allowed to edit brands.', 'brands-for-woocommerce' ) ), 403 );
         }
-        $term_id = intval( sanitize_text_field( $_REQUEST['term_id'] ) );
-        $order   = intval( sanitize_text_field( $_REQUEST['order'] ) );
+        $term_id = isset( $_POST['term_id'] ) ? absint( $_POST['term_id'] ) : 0;
+        $order   = isset( $_POST['order'] ) ? absint( $_POST['order'] ) : 0;
+        $term = get_term( $term_id, self::$taxonomy_name );
+        if ( ! $term instanceof WP_Term ) {
+            wp_send_json_error( array( 'message' => __( 'Invalid brand.', 'brands-for-woocommerce' ) ), 400 );
+        }
 
         update_term_meta( $term_id, 'br_brand_order', $order );
         $this->clear_cache();
-        wp_die();
+        wp_send_json_success();
     }
 
     public function save_all_orders() {
-        $nonce = (empty($_REQUEST['nonce']) ? '' : $_REQUEST['nonce']);
-        if( ! wp_verify_nonce($nonce, 'br_brands_admin') ) {
-            wp_die();
+        check_ajax_referer( 'br_brands_admin', 'nonce' );
+        if ( ! current_user_can( 'manage_product_terms' ) ) {
+            wp_send_json_error( array( 'message' => __( 'You are not allowed to edit brands.', 'brands-for-woocommerce' ) ), 403 );
         }
-        foreach ( $_REQUEST['term_ids'] as $order => $term_id ) {
-            $term_id = intval( str_replace( 'tag-', '', $term_id ) );
+        $term_ids = isset( $_POST['term_ids'] ) && is_array( $_POST['term_ids'] ) ? wp_unslash( $_POST['term_ids'] ) : array();
+        foreach ( $term_ids as $order => $term_id ) {
+            $order = absint( $order );
+            $term_id = absint( str_replace( 'tag-', '', $term_id ) );
+            $term = get_term( $term_id, self::$taxonomy_name );
+            if ( ! $term instanceof WP_Term ) continue;
             update_term_meta( $term_id, 'br_brand_order', $order );
         }
         $this->clear_cache();
-        wp_die();
+        wp_send_json_success();
     }
 
     public $cache_cleared = false;
@@ -1463,12 +1517,12 @@ class BeRocket_product_brand extends BeRocket_Framework {
     }
 
     public function clear_cache_ajax() {
-        $nonce = (empty($_REQUEST['nonce']) ? '' : $_REQUEST['nonce']);
-        if( ! wp_verify_nonce($nonce, 'br_brands_clear_cache') ) {
-            wp_die();
+        check_ajax_referer( 'br_brands_clear_cache', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => __( 'You are not allowed to clear this cache.', 'brands-for-woocommerce' ) ), 403 );
         }
         $this->clear_cache('', true);
-        wp_die();
+        wp_send_json_success();
     }
 
     public function br_get_brands() {

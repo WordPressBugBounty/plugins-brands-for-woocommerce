@@ -116,7 +116,7 @@ var br_savin_ajax = false;
             waiting_title.show();
             save_button.hide();
             $.ajax({
-                type: 'GET',
+                type: 'POST',
                 url: brandsHelper.ajax_url,
                 data: {
                     'action': 'br_brands_save_order',
@@ -143,7 +143,7 @@ var br_savin_ajax = false;
                 $('html, body').css("cursor", "wait");
                 let term_ids = $('#the-list tr').map( function(element) { return this.id; }).get();
                 $.ajax({
-                    type: 'GET',
+                    type: 'POST',
                     url: brandsHelper.ajax_url,
                     data: {
                         'action': 'br_brands_save_all_orders',
@@ -200,7 +200,7 @@ var br_savin_ajax = false;
                 url: brandsHelper.ajax_url,
                 data: {
                     'action': 'br_brands_clear_cache',
-                    'wp_nonce': nonce
+                    'nonce': nonce
                 },
                 success: function(result){
                     self.removeClass('active').val(done);
