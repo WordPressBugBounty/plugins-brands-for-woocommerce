@@ -4,8 +4,8 @@ Contributors: dholovnia, berocket
 Donate link: https://berocket.com/?utm_source=wordpress_org&utm_medium=donate&utm_campaign=product_brand
 Tags: brands, woocommerce, product brands, taxonomy, widget
 Requires at least: 5.0
-Tested up to: 7.0.1
-Stable tag: 3.8.8.1
+Tested up to: 7.0.4
+Stable tag: 3.8.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,10 @@ If none of the previous listed actions helps you to solve the problem, then, sub
 ---
 
 == Changelog ==
+
+= 3.8.9 =
+* Enhancement - Updated BeRocket framework.
+* Security - Hardened framework validation and output handling.
 
 = 3.8.8.1 =
 * Security - Harden shortcode and widget attribute validation and output escaping
