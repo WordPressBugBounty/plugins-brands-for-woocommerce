@@ -31,6 +31,8 @@ class BeRocket_brands_show_brands_class {
             'product_name_display'       => 1,
             'product_name_css'           => '',
         );
+        $plugin_instance = BeRocket_product_brand::getInstance();
+        $plugin_instance->defaults = array_merge($plugin_instance->defaults, $this->defaults);
 
         add_action ( 'init', array( $this, 'addon_init' ) );
     }

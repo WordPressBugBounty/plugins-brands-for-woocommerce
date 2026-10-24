@@ -1,0 +1,15 @@
+.wp-block-berocket-brand-catalog::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+.wp-block-berocket-brand-catalog .br_brand_name {
+    overflow-wrap: anywhere;
+}
+.wp-block-berocket-brand-catalog .br-brands-catalog-empty {
+    padding: 16px;
+    border: 1px dashed #a7aaad;
+}
+.br-brands-catalog-preview[data-first-only="true"] .br_brand_letter_block:not(:first-child) {
+    display: none;
+}

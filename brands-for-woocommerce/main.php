@@ -11,6 +11,7 @@ include_once(plugin_dir_path( __FILE__ ) . "includes/admin/funnels.php");
 class BeRocket_product_brand extends BeRocket_Framework {
     public static $settings_name = 'br-product_brand-options', $taxonomy_name = 'berocket_brand';
     protected static $instance;
+    public $import_export = array();
     protected $plugin_version_capability = 15;
     public $info, $defaults, $values;
     private $attributes;
