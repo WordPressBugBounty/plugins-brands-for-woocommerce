@@ -39,6 +39,8 @@ class BeRocket_brands_show_brands_class {
 
     public function addon_init() {
         $this->brand_icon_display();
+        add_action('br_brands_show_shop', array($this, 'display_shop_post_brands'));
+        add_action('br_brands_show_product', array($this, 'display_product_post_brands'));
         add_filter( 'brfr_tabs_info_product_brand', array( $this, 'brfr_tabs_info' ) );
         add_filter( 'brfr_data_product_brand', array( $this, 'brfr_data' ) );
         add_filter( 'br_brands_options_to_update', array($this, 'options_to_update'), 90 );
@@ -303,6 +305,8 @@ class BeRocket_brands_show_brands_class {
 
         if( !empty( $options['shop_display_brand'] ) && !empty( $options['shop_display_position'] ) ) {
             switch ( $options['shop_display_position'] ) {
+                case 'block_product_collection':
+                    break;
                 case 'in_title_after':
                 case 'in_title_before':
                     remove_action( 'woocommerce_shop_loop_item_title', 'woocommerce_template_loop_product_title' );
@@ -317,6 +321,8 @@ class BeRocket_brands_show_brands_class {
         
         if ( !empty( $options['product_display_brand'] ) && !empty( $options['product_display_position'] ) ) {
             switch ( $options['product_display_position'] ) {
+                case 'block_single_product':
+                    break;
                 case 'brands_tab':
                     add_filter( 'woocommerce_product_tabs', array( $this, 'brands_product_tab' ) );
                     break;

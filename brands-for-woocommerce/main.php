@@ -79,6 +79,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
             'slider_dots'                  => '',
             'slider_dots_color'            => '#00CFFF',
             'slides_to_show'               => '',
+            'grayscale_logos'              => '',
             'custom_css'                   => '',
             'global_font_awesome_disable'  => 1,
             'global_fontawesome_version'   => '',
@@ -156,10 +157,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
 
         if ( $this->init_validation() ) {
             add_action ( 'init', array( $this, 'register_taxonomy' ) );
-            $options = $this->get_option();
-
             add_filter( 'br_brands_options_to_update', array($this, 'options_to_update'), 10 );
-
             add_action ( 'init', array( $this, 'update_from_older' ) );
 
             add_filter( 'berocket_framework_item_content_ajax_button', array( $this, 'ajax_button' ), 10, 6 );
@@ -173,11 +171,11 @@ class BeRocket_product_brand extends BeRocket_Framework {
 
             add_action( "wp_ajax_br_product_brand_settings_save", array ( $this, 'save_settings' ) );
             add_action( "woocommerce_archive_description", array ( $this, 'description' ), 5 );
+            add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_logo_preset' ) );
             add_action ( "widgets_init", array ( $this, 'widgets_init' ) );
 
             add_action ( "woocommerce_duplicate_product", array ( $this, 'woocommerce_duplicate_product' ), 10, 2 );
 
-            // add_filter( 'woocommerce_product_export_column_names', array ( $this, 'brand_product_export_column_names' ) );
             add_filter( 'woocommerce_product_export_product_default_columns', array ( $this, 'brand_product_export_column_names' ) );
             $taxonimy_name = self::$taxonomy_name;
             add_filter( "woocommerce_product_export_product_column_$taxonimy_name", array ( $this, 'brand_export_product_column_brand_taxonomy' ), 10, 2 );
@@ -186,12 +184,12 @@ class BeRocket_product_brand extends BeRocket_Framework {
             add_filter( 'woocommerce_csv_product_import_mapping_default_columns', array ( $this, 'brand_product_import_mapping_default_columns' ) );
             add_filter( 'woocommerce_product_importer_parsed_data', array ( $this, 'brand_product_importer_parsed_data' ), 10, 2 );
             add_filter( 'woocommerce_product_import_inserted_product_object', array ( $this, 'brand_product_import_inserted_product_object' ), 10, 2 );
-            // add_action ( "import_end", array ( $this, 'set_default_meta_values' ) );
 
             add_filter( 'template_include', array( $this, 'template_loader' ) );
             add_action( 'current_screen', array( $this, 'register_permalink_option' ) );
             add_filter( 'berocket_filter_filter_type_array', array( $this, 'filter_type_array' ) );
             add_filter( 'BeRocket_updater_menu_order_sub_order', array($this, 'menu_order_sub_order') );
+
             //WC shortcode compatibility
             add_filter('shortcode_atts_products', array($this, 'wc_shortcode_atts'), 10, 3);
             add_filter('woocommerce_shortcode_products_query', array($this, 'wc_shortcode_query'), 10, 2);
@@ -205,6 +203,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
             add_action( 'divi_module_library_modules_dependency_tree', array($this, 'divi_initialize_divi5_modules') );
             add_action( 'divi_visual_builder_assets_before_enqueue_scripts', array($this, 'divi_enqueue_divi5_assets') );
         }
+
         add_filter('parent_file', array($this, 'select_menu'));
         add_filter('submenu_file', array($this, 'select_submenu'));
     }
@@ -234,7 +233,6 @@ class BeRocket_product_brand extends BeRocket_Framework {
         register_widget("berocket_product_brands_info_widget");
     }
     public function template_loader( $template ) {
-
 		$find = array( 'woocommerce.php' );
 		$file = '';
 
@@ -259,7 +257,10 @@ class BeRocket_product_brand extends BeRocket_Framework {
 
     public function get_brands_template( $located, $template_name, $args, $template_path, $default_path ) {
         if ( is_tax( self::$taxonomy_name ) && $template_name == 'loop/result-count.php' ) {
-            $located = plugin_dir_path( __FILE__ ) . 'templates/result-count.php';
+            $located = locate_template( 'woocommerce-' . $this->info['plugin_name'] . '/result-count.php' );
+            if ( ! $located ) {
+                $located = plugin_dir_path( __FILE__ ) . 'templates/result-count.php';
+            }
         }
         return $located;
     }
@@ -322,6 +323,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
         } else {
             $shop_page_id = woocommerce_get_page_id( 'shop' );
         }
+
 		$base_slug = $shop_page_id > 0 && get_page( $shop_page_id ) ? get_page_uri( $shop_page_id ) : 'shop';
 		$category_base = get_option('woocommerce_prepend_shop_page_to_urls') == "yes" ? trailingslashit( $base_slug ) : '';
 
@@ -368,8 +370,6 @@ class BeRocket_product_brand extends BeRocket_Framework {
 		);
     }
     public function init () {
-        global $woocommerce;
-
         add_filter( 'woocommerce_coupon_is_valid', array( $this, 'validate_coupon' ), 10, 3 );
         add_filter( 'woocommerce_coupon_get_discount_amount', array( $this, 'apply_discount' ), null, 5 );
 
@@ -387,6 +387,13 @@ class BeRocket_product_brand extends BeRocket_Framework {
         wp_enqueue_style( 'berocket_tippy' );
         wp_enqueue_script( 'berocket_front' );
     }
+
+    public function enqueue_logo_preset() {
+        $options = $this->get_option();
+        if ( ! empty( $options['grayscale_logos'] ) ) {
+            wp_enqueue_style( 'berocket_brand_grayscale_logos', plugins_url( 'css/grayscale-logos.css', __FILE__ ), array(), BeRocket_product_brand_version );
+        }
+    }
     function wc_get_product_brand_ids( $product_id ) {
         $product_brands = wc_get_product_term_ids( $product_id, self::$taxonomy_name );
 
@@ -398,18 +405,15 @@ class BeRocket_product_brand extends BeRocket_Framework {
     }
     function wc_get_brands_for_coupon( &$coupon ) {
 		if ( ! isset( $coupon->in_brands ) && ! isset( $coupon->ex_brands ) ) {
-            $in_brands = get_post_meta( $coupon->get_id(), self::$taxonomy_name, true );
-            $ex_brands = get_post_meta( $coupon->get_id(), 'exclude_berocket_brand', true );
-            $coupon->in_brands = $in_brands;
-            $coupon->ex_brands = $ex_brands;
-		} else {
-            $in_brands = $coupon->in_brands;
-            $ex_brands = $coupon->ex_brands;
-        }
+            $coupon->in_brands = get_post_meta( $coupon->get_id(), self::$taxonomy_name, true );
+            $coupon->ex_brands = get_post_meta( $coupon->get_id(), 'exclude_berocket_brand', true );
+		}
+
         return $coupon;
     }
-    public function validate_coupon($valid, $coupon, $coupon_class) {
+    public function validate_coupon( $valid, $coupon, $coupon_class ) {
         if ( ! $valid ) return $valid;
+
         $valid = false;
         foreach ( $coupon_class->get_items_to_validate() as $item ) {
             if ( $coupon->get_exclude_sale_items() && $item->product && $item->product->is_on_sale() ) {
@@ -426,11 +430,12 @@ class BeRocket_product_brand extends BeRocket_Framework {
         if ( ! is_a( $coupon, 'WC_Coupon' ) || ! $coupon->is_type( array( 'fixed_product', 'percent' ) ) ) {
             return $discount;
         }
+
         if( $this->is_coupon_applied_to_product($cart_item['data'], $coupon) ) {
             return $discount;
-        } else {
-            return 0;
         }
+
+        return 0;
     }
     function is_coupon_applied_to_product($product, $coupon) {
         $this->wc_get_brands_for_coupon($coupon);
@@ -506,13 +511,11 @@ class BeRocket_product_brand extends BeRocket_Framework {
 		add_filter( 'woocommerce_product_filters', array( $this, 'product_filter' ) );
 		add_action( 'woocommerce_coupon_options_usage_restriction', array( $this, 'coupon_field' ) );
 		add_action( 'woocommerce_coupon_options_save', array( $this, 'save_coupon' ) );
-        // add_filter( 'woocommerce_sortable_taxonomies', array($this, 'add_brands_to_sortable') );
         add_filter( 'woocommerce_screen_ids', array($this, 'woocommerce_screen_ids') );
 
         add_filter( "manage_berocket_brand_custom_column", array( $this, 'brand_custom_columns' ), 10, 3 );
         add_filter( "manage_edit-berocket_brand_columns", array( $this, 'brand_columns' ) );
         add_filter( "manage_edit-berocket_brand_sortable_columns", array( $this, 'brand_sortable_columns' ) );
-        // add_filter( "manage_berocket_brand_custom_column", array( $this, 'brand_order_columns' ), 10, 3 );
         add_action( 'pre_get_terms', array( $this, 'pre_get_brands' ) );
     }
 
@@ -530,12 +533,15 @@ class BeRocket_product_brand extends BeRocket_Framework {
         return $html;
     }
 
-    // public function add_brands_to_sortable($taxonomies) {
-    //     $taxonomies[] = self::$taxonomy_name;
-    //     return $taxonomies;
-    // }
-
     public function brand_columns( $columns ) {
+        $name_position = array_search( 'name', array_keys( $columns ), true );
+        $thumbnail = array( 'brand_thumbnail' => __( 'Thumbnail', 'brands-for-woocommerce' ) );
+        if ( false === $name_position ) {
+            $columns += $thumbnail;
+        } else {
+            $offset = $name_position + 1;
+            $columns = array_slice( $columns, 0, $offset, true ) + $thumbnail + array_slice( $columns, $offset, null, true );
+        }
         $columns['brand_description'] = __( 'Description', 'brands-for-woocommerce' );
         $columns['order'] = __( 'Order', 'brands-for-woocommerce' );
         unset( $columns['description'] );
@@ -548,7 +554,13 @@ class BeRocket_product_brand extends BeRocket_Framework {
     }
 
     public function brand_custom_columns( $value, $name, $term_id ) {
-        if ( $name == 'brand_description' ) {
+        if ( 'brand_thumbnail' === $name ) {
+            $image_url = esc_url( get_term_meta( $term_id, 'brand_image_url', true ) );
+            if ( '' === $image_url ) {
+                return '<span aria-hidden="true">&mdash;</span><span class="screen-reader-text">' . esc_html__( 'No thumbnail', 'brands-for-woocommerce' ) . '</span>';
+            }
+            return '<img src="' . $image_url . '" alt="" width="48" height="48" loading="lazy" decoding="async" />';
+        } else if ( $name == 'brand_description' ) {
             $value = wp_trim_words( term_description( $term_id ), 15 );
         } else if ( $name == 'order' ) {
             $order = get_term_meta( $term_id, 'br_brand_order', true );
@@ -574,24 +586,17 @@ class BeRocket_product_brand extends BeRocket_Framework {
                 </a>
                 <i class='fa fa-bars ui-sortable-handle br-brands-sortable-handler'></i></div>";
 
-            // return $value = '<span class="br-sorted-holder"><i class="fas fa-arrows-alt-v"></i></span>' . get_term_meta( $term_id, 'br_brand_order', true );
         }
         return $value;
     }
-    
-    // public function sort_brands_by_order( $pieces, $taxonomies, $args ) {
-    //     global $pagenow;
-    //     if( !is_admin() || $pagenow != 'edit-tags.php' || empty( $taxonomies ) || $taxonomies[0] != self::$taxonomy_name ) {
-    //         return $pieces;
-    //     }
-    //     // $pieces['orderby'] = 'ORDER BY tt.br_brand_order';
-    //     // bd($pieces);
-    //     return $pieces;
-    // }
 
     public function pre_get_brands( $query ) {
         global $pagenow;
-        if ( !is_admin() || $pagenow != 'edit-tags.php' || $query->query_vars['taxonomy'][0] != self::$taxonomy_name ) {
+        if ( ! is_admin()
+             || $pagenow !== 'edit-tags.php'
+             || ! is_array( $query->query_vars['taxonomy'] ?? null )
+             || ! isset( $query->query_vars['taxonomy'][0] )
+             || $query->query_vars['taxonomy'][0] !== self::$taxonomy_name ) {
             return $query;
         }
 
@@ -623,7 +628,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
     }
     public function register_permalink_option() {
         $screen = get_current_screen();
-        $default_values = '';
+
         if($screen->id == 'options-permalink') {
             $this->save_permalink_option();
             $this->_register_permalink_option();
@@ -696,14 +701,8 @@ class BeRocket_product_brand extends BeRocket_Framework {
                 case 'products_selector':
                     $fields .=  br_products_selector( $name, $value, array(
                         'type' => 'products',
-                        // label] => Blocking Products
-                        // label_be_for] => No one of this products in cart
                         'name' => $name,
-                        // extra =>  id='br_minmax_products_blocking' 
                         'value' => $value,
-                        // tr_class] => 
-                        // td_class] => 
-                        // label_for] => 
                     ));
                     break;
 
@@ -813,11 +812,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
     }
 
     public function clear_cache_on_edit_post( $post_ID, $post ) {
-        // if ( get_post_type( $post_ID ) == 'product' ) {
-            $this->clear_cache();
-        //     return;
-        // }
-        // $this->clear_cache( "{$this->cache_key}_$post_ID" );
+        $this->clear_cache();
     }
 
     public function description() {
@@ -1215,6 +1210,13 @@ class BeRocket_product_brand extends BeRocket_Framework {
             ),
             'CSS'     => array(
                 array(
+                    "type"      => "checkbox",
+                    "label"     => __( 'Grayscale brand logos', 'brands-for-woocommerce' ),
+                    "label_for" => __( 'Show the original colors on hover or focus.', 'brands-for-woocommerce' ),
+                    "name"      => "grayscale_logos",
+                    "value"     => 1,
+                ),
+                array(
                     "type"  => "textarea",
                     "label" => __('Custom CSS', 'brands-for-woocommerce'),
                     "name"  => "custom_css",
@@ -1562,6 +1564,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
     public function woocommerce_duplicate_product( $new_id, $post ) {
         $brands = get_the_terms($post->ID, self::$taxonomy_name );
         if ( empty($brands) ) return;
+
         $brands_id = wp_list_pluck( $brands, 'term_id' );
         wp_set_post_terms( $new_id, $brands_id, self::$taxonomy_name );
     }
@@ -1595,7 +1598,7 @@ class BeRocket_product_brand extends BeRocket_Framework {
     public function brand_product_import_inserted_product_object( $product, $data ) {
         if ( !is_a( $product, 'WC_Product' ) || empty( $data[ self::$taxonomy_name ] ) ) return $product;
 
-        $object_terms = wp_set_object_terms( $product->get_id(), (array) $data[ self::$taxonomy_name ], self::$taxonomy_name );
+        wp_set_object_terms( $product->get_id(), (array) $data[ self::$taxonomy_name ], self::$taxonomy_name );
         return $product;
     }
 

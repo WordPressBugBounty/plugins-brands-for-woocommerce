@@ -193,8 +193,35 @@
     border: 1px solid #7e8993;
     border-radius: 3px;
     margin: 0 3px;
-    max-height: 100px;
+    box-sizing: border-box;
+    height: 40px;
+    width: auto;
     max-width: 200px;
+    object-fit: contain;
+    vertical-align: middle;
+}
+
+.berocket_aapf_selected_icon_show i {
+    font-size: 40px;
+    display: block;
+}
+
+.berocket_aapf_selected_icon_show i img {
+    margin: 0 !important;
+    max-width: 40px;
+    max-height: 40px;
+    display: block;
+}
+
+.berocket_aapf_selected_icon_show {
+    margin: 0 !important;
+    display: block;
+}
+
+.br_brands_image > div {
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
 .column-taxonomy-berocket_brand {
@@ -222,8 +249,17 @@
     width: 30%;
 }
 
+.taxonomy-berocket_brand th.column-brand_thumbnail {
+    width: 72px;
+}
+
+.taxonomy-berocket_brand .column-brand_thumbnail img {
+    object-fit: contain;
+    vertical-align: middle;
+}
+
 .taxonomy-berocket_brand .column-order {
-    width: 140px;
+    width: 160px;
 }
 
 .taxonomy-berocket_brand .column-slug {
@@ -236,9 +272,10 @@
 }
 
 .taxonomy-berocket_brand .berocket_tax_set_new_sortable_input input {
-    padding-right: 18px!important;
-    width: 55px;
+    padding-right: 4px;
+    width: 50px;
     min-height: 30px;
+    margin: 0;
 }
 
 .taxonomy-berocket_brand  .berocket_tax_set_new_sortable .fa {
@@ -250,6 +287,8 @@
     display: inline-block;
     position: relative;
     height: 30px;
+    padding-right: 20px;
+    flex-shrink: 0;
 }
 
 .taxonomy-berocket_brand .striped > tbody .br-sortable-placeholder {

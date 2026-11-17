@@ -1,0 +1,10 @@
+:is(.br_widget_brand_element_slider, .br_brand_letter_element) > .brand_info > a > img,
+img:is(.br_brand_thumbnail, .berocket_brand_post_image) {
+    filter: grayscale(1);
+}
+
+:is(.br_widget_brand_element_slider, .br_brand_letter_element) > .brand_info > a:is(:hover, :focus) > img,
+a:is(:hover, :focus) img:is(.br_brand_thumbnail, .berocket_brand_post_image),
+img:is(.br_brand_thumbnail, .berocket_brand_post_image):is(:hover, :focus) {
+    filter: none;
+}

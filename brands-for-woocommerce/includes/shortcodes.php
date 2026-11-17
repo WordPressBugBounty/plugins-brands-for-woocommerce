@@ -56,6 +56,9 @@ class BeRocket_product_brand_shortcode {
             $atts = array();
         }
         $atts = berocket_sanitize_array($atts);
+        if( empty($atts['product']) && get_post_type() === 'product' ) {
+            $atts['product'] = get_the_ID();
+        }
         ob_start();
         the_widget( 'berocket_product_brands_info_widget', $atts );
         return ob_get_clean();

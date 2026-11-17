@@ -4,8 +4,8 @@ Contributors: dholovnia, berocket
 Donate link: https://berocket.com/?utm_source=wordpress_org&utm_medium=donate&utm_campaign=product_brand
 Tags: brands, woocommerce, product brands, taxonomy, widget
 Requires at least: 5.0
-Tested up to: 7.1.3
-Stable tag: 3.9
+Tested up to: 7.1.4
+Stable tag: 3.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -77,6 +77,10 @@ Important: First of all, you have to download and activate the WooCommerce plugi
 = Configuration =
 Brands for WooCommerce will add a new sub-menu item called "Brands" in the "WooCommerce" menu. There you will be able to access the plugin settings page.
 
+In the CSS tab, enable "Grayscale brand logos" to show logos in black and white on the storefront. Hover over a logo or focus its link with the keyboard to see its original colors.
+
+The brand list under BeRocket > Brands > All Brands shows each brand's current logo in the Thumbnail column.
+
 
 == Frequently Asked Questions ==
 
@@ -101,6 +105,15 @@ If none of the previous listed actions helps you to solve the problem, then, sub
 ---
 
 == Changelog ==
+
+= 3.10 =
+* Feature - Added an optional grayscale brand logo preset that restores original colors on hover or keyboard focus.
+* Feature - Added a Thumbnail column to the admin brand list.
+* Enhancement - Grouped legacy shortcode help under a collapsible Deprecated Shortcodes section.
+* Fix - Prevented the order field controls from overlapping brand order numbers.
+* Enhancement - Aligned thumbnail and banner previews with their upload and remove buttons.
+* Feature - Added brand display positions for WooCommerce Product Collection and single-product blocks, with tooltip updates after block navigation.
+* Enhancement - Updated BeRocket Framework to 3.1.5 with optional premium product links and restored import/export regression coverage.
 
 = 3.9 =
 * Feature - Added a Gutenberg block for the brand catalog.

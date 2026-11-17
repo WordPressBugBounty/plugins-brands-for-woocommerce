@@ -717,6 +717,10 @@ msgstr ""
 msgid "Go to the brand website >>"
 msgstr ""
 
+#: main.php:1214
+msgid "Grayscale brand logos"
+msgstr ""
+
 #: main.php:1578
 msgid "group brands by:"
 msgstr ""
@@ -969,6 +973,10 @@ msgstr ""
 
 #: main.php:1582
 msgid "no group"
+msgstr ""
+
+#: main.php:560
+msgid "No thumbnail"
 msgstr ""
 
 #: includes/base-widget.php:163 includes/functions.php:72
@@ -1319,6 +1327,10 @@ msgstr ""
 
 #: includes/base-widget_ordered.php:99
 msgid "Show only selected brand(s)"
+msgstr ""
+
+#: main.php:1215
+msgid "Show the original colors on hover or focus."
 msgstr ""
 
 #. %d: total results

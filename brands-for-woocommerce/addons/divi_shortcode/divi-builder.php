@@ -200,9 +200,10 @@ class brbrand_deprecated_shortcodes_divi_addon {
         return $atts;
     }
     public function shortcodes_explanation($explanation) {
-        $explanation[] = '<li>
+        $deprecated_explanation = array();
+        $deprecated_explanation[] = '<li>
                         <span class="br_shortcode_title">
-                            <strong><i class="fas fa-caret-right"></i>&nbsp;DEPRECATED [brands_list]</strong> - '.__("list of brands", 'brands-for-woocommerce').'
+                            <strong><i class="fas fa-caret-right"></i>&nbsp;[brands_list]</strong> - '.__("list of brands", 'brands-for-woocommerce').'
                         </span>
                         <ul class="br_shortcode_attributes">
                             <li><i>title</i> - '.__("title of the brand list", 'brands-for-woocommerce').'</li>
@@ -264,9 +265,9 @@ class brbrand_deprecated_shortcodes_divi_addon {
                             <li><i>exclude</i> - '.__("brands to exclude from display (i.e. exclude='45,47,52,61')", 'brands-for-woocommerce').'</li>
                         </ul>
                     </li>';
-        $explanation[] = '<li>
+        $deprecated_explanation[] = '<li>
                         <span class="br_shortcode_title">
-                            <strong><i class="fas fa-caret-right"></i>&nbsp;DEPRECATED [brands_catalog]</strong> - '.__("brands grouped by name or category", 'brands-for-woocommerce').'
+                            <strong><i class="fas fa-caret-right"></i>&nbsp;[brands_catalog]</strong> - '.__("brands grouped by name or category", 'brands-for-woocommerce').'
                         </span>
                         <ul class="br_shortcode_attributes">
                             <li><i>title</i> - '.__("title of the brand catalog", 'brands-for-woocommerce').'</li>
@@ -337,9 +338,9 @@ class brbrand_deprecated_shortcodes_divi_addon {
                             <li><i>exclude</i> - '.__("brands to exclude from display (i.e. exclude='45,47,52,61')", 'brands-for-woocommerce').'</li>
                         </ul>
                     </li>';
-        $explanation[] = '<li>
+        $deprecated_explanation[] = '<li>
                         <span class="br_shortcode_title">
-                            <strong><i class="fas fa-caret-right"></i>&nbsp;DEPRECATED [brands_products]</strong> - '.__("product list for given brands (by ids or slugs)", 'brands-for-woocommerce').'
+                            <strong><i class="fas fa-caret-right"></i>&nbsp;[brands_products]</strong> - '.__("product list for given brands (by ids or slugs)", 'brands-for-woocommerce').'
                         </span>
                         <ul class="br_shortcode_attributes">
                             <li><i>brand_id</i> - '.__("one or more brand ID (example: brand_id='12,34,35')", 'brands-for-woocommerce').'</li>
@@ -366,9 +367,9 @@ class brbrand_deprecated_shortcodes_divi_addon {
                             <li><i>hide_brands</i> - '.__("1 to hide brands", 'brands-for-woocommerce').'
                         </ul>
                     </li>';
-        $explanation[] = '<li>
+        $deprecated_explanation[] = '<li>
                         <span class="br_shortcode_title">
-                            <strong><i class="fas fa-caret-right"></i>&nbsp;DEPRECATED [brands_info]</strong> - '.__("show information about brand", 'brands-for-woocommerce').'
+                            <strong><i class="fas fa-caret-right"></i>&nbsp;[brands_info]</strong> - '.__("show information about brand", 'brands-for-woocommerce').'
                         </span>
                         <ul class="br_shortcode_attributes">
                             <li><i>id</i> - '.__("brand ID", 'brands-for-woocommerce').'</l</b>i>' .
@@ -379,9 +380,9 @@ class brbrand_deprecated_shortcodes_divi_addon {
                             . '</li>
                         </ul>
                     </li>';
-        $explanation[] = '<li>
+        $deprecated_explanation[] = '<li>
                         <span class="br_shortcode_title">
-                            <strong><i class="fas fa-caret-right"></i>&nbsp;DEPRECATED [brands_product_thumbnail]</strong> - '.__("brand image for product page", 'brands-for-woocommerce').'
+                            <strong><i class="fas fa-caret-right"></i>&nbsp;[brands_product_thumbnail]</strong> - '.__("brand image for product page", 'brands-for-woocommerce').'
                         </span>
                         <ul class="br_shortcode_attributes">
                             <li><i>post_id</i> - '.__("product id", 'brands-for-woocommerce').'</li>
@@ -397,9 +398,9 @@ class brbrand_deprecated_shortcodes_divi_addon {
                             <li><i>url</i> - '.__("display image as link (1 or 0, default is 0)", 'brands-for-woocommerce').'</li>
                         </ul>
                     </li>';
-        $explanation[] = '<li>
+        $deprecated_explanation[] = '<li>
                         <span class="br_shortcode_title">
-                            <strong><i class="fas fa-caret-right"></i>&nbsp;DEPRECATED [product_brands_info]</strong> - '.__("single brand info for single product", 'brands-for-woocommerce').'
+                            <strong><i class="fas fa-caret-right"></i>&nbsp;[product_brands_info]</strong> - '.__("single brand info for single product", 'brands-for-woocommerce').'
                         </span>
                         <ul class="br_shortcode_attributes">
                             <li><i>product_id</i> - '.__("product ID; on single product page can get it automatically", 'brands-for-woocommerce').'</li>' .
@@ -409,6 +410,10 @@ class brbrand_deprecated_shortcodes_divi_addon {
                             . '</li>
                         </ul>
                     </li>';
+        $explanation[] = '<li><details class="br_deprecated_shortcodes">
+            <summary><strong>' . esc_html__( 'DEPRECATED SHORTCODES', 'brands-for-woocommerce' ) . '</strong></summary>
+            <ul>' . implode( '', $deprecated_explanation ) . '</ul>
+        </details></li>';
         return $explanation;
     }
 
